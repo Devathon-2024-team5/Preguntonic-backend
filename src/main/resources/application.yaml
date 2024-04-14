@@ -1,3 +1,14 @@
 spring:
   application:
     name: preguntonic
+    
+  output:
+    ansi:
+      enabled: always
+
+# Debug Logging
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG

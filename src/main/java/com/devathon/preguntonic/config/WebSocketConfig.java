@@ -43,11 +43,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     // Help:
     // [1] The prefix for the application destination is used to filter the messages
-    // that are sent
-    // from the client to the server.
+    // that are sent from the client to the server.
     // [2] Enable a simple broker in memory to send messages from the server to the
-    // client. The
-    // destinations are used to filter the messages.
+    // client. The destinations are used to filter the messages.
     // Any message that doesn't match with any of the destinations will be ignored.
   }
 }

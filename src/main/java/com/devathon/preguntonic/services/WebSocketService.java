@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @EnableScheduling
-public class WebSockerService {
+public class WebSocketService {
 
   @Autowired private SimpMessagingTemplate simpMessagingTemplate;
 

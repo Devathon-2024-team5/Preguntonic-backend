@@ -40,12 +40,13 @@ public class RoomControllerImpl implements RoomController {
 
   @Override
   public ResponseEntity<String> joinRoom(final String roomId, final String username) {
+    log.info("Joining room {} with user {}", roomId, username);
     if (roomService.getRoom(roomId).isEmpty()) {
       return ResponseEntity.notFound().build();
     }
 
     roomService.joinRoom(roomId, username);
-    messagingTemplate.convertAndSend("/rooms/" + roomId, username + " joined the room");
+    messagingTemplate.convertAndSend("/room/" + roomId, username + " joined the room");
     return ResponseEntity.ok("Joined room " + roomId);
   }
 }

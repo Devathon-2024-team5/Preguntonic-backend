@@ -8,8 +8,7 @@ package com.devathon.preguntonic.controllers;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +26,6 @@ public interface RoomController {
   @GetMapping("/{roomId}")
   ResponseEntity<String> getRoom(@PathVariable String roomId);
 
-  @SubscribeMapping("/rooms.join/{roomId}")
-  @SendTo("/topic/rooms/{roomId}")
+  @MessageMapping("/rooms.join/{roomId}")
   ResponseEntity<String> joinRoom(@DestinationVariable String roomId, String username);
 }

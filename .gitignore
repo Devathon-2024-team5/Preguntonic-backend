@@ -38,6 +38,9 @@ build/
 ### Mac OS ###
 .DS_Store
 
+### Jenv ###
+.java-version
+
 # Compiled class file
 *.class
 

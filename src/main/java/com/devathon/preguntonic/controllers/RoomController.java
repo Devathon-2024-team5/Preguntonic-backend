@@ -17,6 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -25,7 +26,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public interface RoomController {
 
   @PostMapping
-  ResponseEntity<RoomPlayerInitResponse> createRoom(RoomPlayerInitInfo roomPlayerInitInfo);
+  ResponseEntity<RoomPlayerInitResponse> createRoom(
+      @RequestBody RoomPlayerInitInfo roomPlayerInitInfo);
 
   @GetMapping
   ResponseEntity<List<String>> getRooms();
@@ -37,10 +39,12 @@ public interface RoomController {
   ResponseEntity<PlayerEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);
 
   @MessageMapping("/rooms.ready/{roomId}/{playerId}")
-  ResponseEntity<PlayerEvent> playerReadyInRoom(@DestinationVariable String roomId, int playerId);
+  ResponseEntity<PlayerEvent> playerReadyInRoom(
+      @DestinationVariable String roomId, @DestinationVariable int playerId);
 
   @MessageMapping("/rooms.unready/{roomId}/{playerId}")
-  ResponseEntity<PlayerEvent> playerUnReadyInRoom(@DestinationVariable String roomId, int playerId);
+  ResponseEntity<PlayerEvent> playerUnReadyInRoom(
+      @DestinationVariable String roomId, @DestinationVariable int playerId);
 
   @EventListener
   void handleWebSocketConnectListener(SessionConnectEvent event);

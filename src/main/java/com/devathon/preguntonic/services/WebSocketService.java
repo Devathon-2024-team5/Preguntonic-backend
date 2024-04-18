@@ -18,7 +18,7 @@ public class WebSocketService {
   @Autowired private SimpMessagingTemplate simpMessagingTemplate;
 
   /** Example of a method that sends a message to the topic "/room/room1". */
-  @Scheduled(fixedRate = 5000)
+//  @Scheduled(fixedRate = 5000)
   public void exampleScheduledMethod() {
 
     final String message = "Hello, this is a scheduled message!";

@@ -69,11 +69,18 @@
     }
 
     function createRoom(){
+      var player_name = document.getElementById('from').value;
       fetch("http://localhost:8080/v1/rooms", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          max_players: 4,
+          num_of_questions: 10,
+          player_name: player_name,
+          avatar_id: 1
+        })
       }).then(response => {
         console.log(response)
         getRooms();
@@ -83,8 +90,23 @@
     function joinRoom() {
       var roomId = document.getElementById('roomId').value;
       var from = document.getElementById('from').value;
+      console.log(roomId + " - " + from);
+      let response = stompClient.send(`/app/rooms.join/${roomId}`, {}, JSON.stringify({'player_name': from, 'avatar_id': 1}));
+      console.log("response: " + response);
+    }
+
+    function readyRoom() {
+      var roomId = document.getElementById('roomId').value;
+      var from = document.getElementById('from').value;
       console.log(roomId + " - " + from)
-      stompClient.send(`/app/rooms.join/${roomId}`, {}, from);
+      stompClient.send(`/app/rooms.ready/${roomId}/1`, {}, 1);
+    }
+
+    function unReadyRoom() {
+      var roomId = document.getElementById('roomId').value;
+      var from = document.getElementById('from').value;
+      console.log(roomId + " - " + from)
+      stompClient.send(`/app/rooms.unready/${roomId}/1`, {}, 1);
     }
   </script>
 </head>
@@ -103,6 +125,8 @@
     <button id="get-rooms" onclick="getRooms();">get Rooms</button>
     <button id="create-rooms" onclick="createRoom();">create Room</button>
     <button id="join-rooms" onclick="joinRoom();">Join Room</button>
+    <button id="ready-rooms" onclick="readyRoom();">Ready Room</button>
+    <button id="unready-rooms" onclick="unReadyRoom();">Unready Room</button>
   </div>
   <div>
     <button id="connect" onclick="connect();">Connect</button>

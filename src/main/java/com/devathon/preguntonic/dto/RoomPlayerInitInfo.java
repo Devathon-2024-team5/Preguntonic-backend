@@ -11,4 +11,4 @@ public record RoomPlayerInitInfo(
     @JsonProperty("max_players") int maxPlayers,
     @JsonProperty("num_of_question") int numberOfQuestions,
     @JsonProperty("player_name") String playerName,
-    @JsonProperty("avatar_id") int playerAvatarId) {}
+    @JsonProperty("avatar_id") String playerAvatarId) {}

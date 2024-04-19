@@ -47,11 +47,15 @@ public class RoomControllerImpl implements RoomController {
   }
 
   @Override
-  public ResponseEntity<String> getRoom(final String roomId) {
-    if (roomService.getRoom(roomId).isPresent()) {
-      return ResponseEntity.ok(roomId);
-    }
-    return ResponseEntity.notFound().build();
+  public ResponseEntity<Room> getRoom(final String roomId) {
+    return roomService
+        .getRoom(roomId)
+        .map(
+            room -> {
+              log.info("Room found: {}", room);
+              return ResponseEntity.ok(room);
+            })
+        .orElse(ResponseEntity.notFound().build());
   }
 
   @Override

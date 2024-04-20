@@ -5,7 +5,8 @@
  */
 package com.devathon.preguntonic.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record PlayerEvent(BasicPlayer player, String event) {}
+public record PlayerEvent(@JsonProperty BasicPlayer player, @JsonProperty String event) {}

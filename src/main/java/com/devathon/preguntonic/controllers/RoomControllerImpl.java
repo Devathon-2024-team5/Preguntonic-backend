@@ -13,6 +13,7 @@ import com.devathon.preguntonic.model.Room;
 import com.devathon.preguntonic.model.RoomEvent;
 import com.devathon.preguntonic.services.RoomService;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -65,8 +66,13 @@ public class RoomControllerImpl implements RoomController {
       log.info("Room {} not found", roomId);
       return ResponseEntity.notFound().build();
     }
-
-    int playerId = roomService.joinRoom(roomId, player.name());
+    int playerId = -1;
+    // Special cases for the room creator!
+    if (Objects.nonNull(player.id())) {
+      playerId = player.id();
+    } else {
+      playerId = roomService.joinRoom(roomId, player.name());
+    }
     BasicPlayer playerWithId = new BasicPlayer(playerId, player.name(), player.avatarId());
 
     PlayerEvent playerEvent =

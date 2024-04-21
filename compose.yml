@@ -1,0 +1,8 @@
+services:
+  preguntonic-backend:
+    container_name: preguntonic-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080

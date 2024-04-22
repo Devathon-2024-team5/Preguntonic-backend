@@ -1,6 +1,6 @@
 asyncapi: 3.0.0
 info:
-  title: Example API
+  title: Preguntonic API
   version: 1.0.0
   description: |-
     Preguntonic is a simple API that allows you to ask questions and get answers in real-time.

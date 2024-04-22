@@ -11,4 +11,7 @@ HEALTHCHECK --interval=30s --timeout=10s \
 
 ENV TZ="UTC"
 
+# Volume containing the H2 data
+VOLUME /usr/lib/h2
+
 ENTRYPOINT ["java", "-jar", "/service/bin/preguntonic.jar"]

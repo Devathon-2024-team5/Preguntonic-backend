@@ -25,7 +25,7 @@
         console.log('Connected: ' + frame + " - " + roomId);
         stompClient.subscribe(`/room/${roomId}`, function(messageOutput) {
           console.log(messageOutput)
-          // showMessageOutput(JSON.parse(messageOutput.body));
+          showMessageOutput(JSON.parse(messageOutput.body));
         });
       });
     }
@@ -46,11 +46,15 @@
     }
 
     function showMessageOutput(messageOutput) {
+      console.log("Objeto parseado:" ,messageOutput)
       var response = document.getElementById('response');
       var p = document.createElement('p');
       p.style.wordWrap = 'break-word';
-      p.appendChild(document.createTextNode(messageOutput.from + ": "
-          + messageOutput.text + " (" + messageOutput.time + ")"));
+      if (messageOutput.event === 'JOIN') {
+        p.appendChild(document.createTextNode(messageOutput.room + ": "
+            + messageOutput.room.max_players + " (" + messageOutput.room.room_code + ")"));
+      }
+
       response.appendChild(p);
     }
 

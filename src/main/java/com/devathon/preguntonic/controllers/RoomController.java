@@ -9,6 +9,7 @@ import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.PlayerEvent;
 import com.devathon.preguntonic.dto.RoomPlayerInitInfo;
 import com.devathon.preguntonic.dto.RoomPlayerInitResponse;
+import com.devathon.preguntonic.model.Room;
 import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public interface RoomController {
   ResponseEntity<List<String>> getRooms();
 
   @GetMapping("/{roomId}")
-  ResponseEntity<String> getRoom(@PathVariable String roomId);
+  ResponseEntity<Room> getRoom(@PathVariable String roomId);
 
   @MessageMapping("/rooms.join/{roomId}")
   ResponseEntity<PlayerEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);

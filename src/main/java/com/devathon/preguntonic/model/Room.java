@@ -6,6 +6,7 @@
 package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,4 +27,9 @@ public class Room {
   private int currentPlayers;
   private int numQuestions;
   private LocalDateTime createdAt;
+  private List<Player> players;
+
+  public int countReadyPlayers() {
+    return (int) players.stream().filter(Player::isReady).count();
+  }
 }

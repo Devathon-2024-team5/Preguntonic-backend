@@ -11,4 +11,4 @@ import lombok.Builder;
 
 @Builder
 public record RoomStatusEvent(
-    @JsonProperty RoomStatusDto roomStatus, @JsonProperty RoomEvent event) {}
+    @JsonProperty("room") RoomStatusDto roomStatus, @JsonProperty RoomEvent event) {}

@@ -13,8 +13,8 @@ import java.util.List;
 
 public record RoomStatusDto(
     @JsonProperty("current_players") List<Player> players,
-    @JsonProperty int readyPlayers,
-    @JsonProperty int maxPlayers,
+    @JsonProperty("ready_players") int readyPlayers,
+    @JsonProperty("max_players") int maxPlayers,
     @JsonProperty("room_code") String roomCode,
     @JsonProperty("room_status") RoomStatus status) {
 

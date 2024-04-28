@@ -30,6 +30,9 @@ public class Room {
   private List<Player> players;
 
   public int countReadyPlayers() {
+    if (players == null) {
+      return 0;
+    }
     return (int) players.stream().filter(Player::isReady).count();
   }
 }

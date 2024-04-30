@@ -95,7 +95,7 @@
       var roomId = document.getElementById('roomId').value;
       var from = document.getElementById('from').value;
       console.log(roomId + " - " + from);
-      let response = stompClient.send(`/app/rooms.join/${roomId}`, {}, JSON.stringify({'player_name': from, 'avatar_id': 1}));
+      let response = stompClient.send(`/app/rooms/${roomId}/lobby/join`, {}, JSON.stringify({'player_name': from, 'avatar_id': 1}));
       console.log("response: " + response);
     }
 
@@ -103,14 +103,14 @@
       var roomId = document.getElementById('roomId').value;
       var from = document.getElementById('from').value;
       console.log(roomId + " - " + from)
-      stompClient.send(`/app/rooms.ready/${roomId}/1`, {}, 1);
+      stompClient.send(`/app/rooms/${roomId}/lobby/players/1/ready`, {}, 1);
     }
 
     function unReadyRoom() {
       var roomId = document.getElementById('roomId').value;
       var from = document.getElementById('from').value;
       console.log(roomId + " - " + from)
-      stompClient.send(`/app/rooms.unready/${roomId}/1`, {}, 1);
+      stompClient.send(`/app/rooms/${roomId}/lobby/players/1/unready`, {}, 1);
     }
   </script>
 </head>

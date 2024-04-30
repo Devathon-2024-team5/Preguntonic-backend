@@ -39,11 +39,11 @@ public interface RoomController {
   @MessageMapping("/rooms/{roomId}/lobby/join")
   ResponseEntity<LobbyEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);
 
-  @MessageMapping("/rooms/{roomId}/lobby/player/{playerId}/ready")
+  @MessageMapping("/rooms/{roomId}/lobby/players/{playerId}/ready")
   ResponseEntity<LobbyEvent> playerReadyInRoom(
       @DestinationVariable String roomId, @DestinationVariable int playerId);
 
-  @MessageMapping("/rooms/{roomId}/lobby/player/{playerId}/unready")
+  @MessageMapping("/rooms/{roomId}/lobby/players/{playerId}/unready")
   ResponseEntity<LobbyEvent> playerUnReadyInRoom(
       @DestinationVariable String roomId, @DestinationVariable int playerId);
 

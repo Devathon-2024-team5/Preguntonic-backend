@@ -17,7 +17,7 @@ class RoomStatusDtoTest {
 
   @Test
   void serializeBasicObject() throws Exception {
-    var roomStatusDto = new RoomStatusDto(null, 0, 0, "roomCode", RoomStatus.IN_GAME);
+    var roomStatusDto = new LobbyStatusDto(null, 0, 0, "roomCode", RoomStatus.IN_GAME);
     var expected =
         "{\"current_players\":null,\"room_code\":\"roomCode\",\"room_status\":\"IN_GAME\",\"readyPlayers\":0,\"maxPlayers\":0}";
 
@@ -30,9 +30,9 @@ class RoomStatusDtoTest {
   void deserialize() throws Exception {
     var json =
         "{\"current_players\":null,\"readyPlayers\":0,\"maxPlayers\":0,\"room_code\":\"roomCode\",\"room_status\":\"WAITING\"}";
-    var expected = new RoomStatusDto(null, 0, 0, "roomCode", RoomStatus.WAITING);
+    var expected = new LobbyStatusDto(null, 0, 0, "roomCode", RoomStatus.WAITING);
 
-    var deserialized = objectMapper.readValue(json, RoomStatusDto.class);
+    var deserialized = objectMapper.readValue(json, LobbyStatusDto.class);
 
     assertEquals(expected, deserialized);
   }

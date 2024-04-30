@@ -10,4 +10,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record PlayerEvent(@JsonProperty BasicPlayer player, @JsonProperty RoomEvent event) {}
+public record LobbyEvent(
+    @JsonProperty("room") LobbyStatusDto roomStatus, @JsonProperty RoomEvent event) {}

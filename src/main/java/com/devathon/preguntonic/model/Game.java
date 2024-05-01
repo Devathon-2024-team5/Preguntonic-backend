@@ -7,6 +7,9 @@ package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.devathon.preguntonic.domain.Question;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +22,7 @@ import lombok.NoArgsConstructor;
 public class Game {
 
   private UUID id;
-  private Room room;
+  private Question currentQuestion;
+  private int currentQuestionOrdinal;
   private LocalDateTime createdAt;
 }

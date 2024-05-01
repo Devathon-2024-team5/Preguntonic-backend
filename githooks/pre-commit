@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -x
+mvn spotless:check
+if [ $? -eq 1 ]
+then
+  mvn spotless:apply
+  echo "Formatting errors fixed re-attempt commit!"
+  exit 1
+else
+  echo "You comply with code standards - Good to commit!"
+fi

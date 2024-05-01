@@ -7,8 +7,7 @@ package com.devathon.preguntonic.controllers;
 
 import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.LobbyEvent;
-import com.devathon.preguntonic.dto.RoomPlayerInitInfo;
-import com.devathon.preguntonic.dto.RoomPlayerInitResponse;
+import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Room;
 import java.util.List;
 import org.springframework.context.event.EventListener;
@@ -27,8 +26,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public interface RoomController {
 
   @PostMapping
-  ResponseEntity<RoomPlayerInitResponse> createRoom(
-      @RequestBody RoomPlayerInitInfo roomPlayerInitInfo);
+  ResponseEntity<String> createRoom(@RequestBody RoomConfiguration roomConfiguration);
 
   @GetMapping
   ResponseEntity<List<String>> getRooms();
@@ -36,6 +34,11 @@ public interface RoomController {
   @GetMapping("/{roomId}")
   ResponseEntity<Room> getRoom(@PathVariable String roomId);
 
+  @PostMapping("/{roomId}/players")
+  ResponseEntity<BasicPlayer> addPlayerRoom(
+      @PathVariable String roomId, @RequestBody BasicPlayer player);
+
+  // Websocket endpoints
   @MessageMapping("/rooms/{roomId}/lobby/join")
   ResponseEntity<LobbyEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);
 

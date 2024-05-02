@@ -6,7 +6,6 @@
 package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -29,5 +28,4 @@ public class Room {
   private LocalDateTime createdAt;
 
   private final Map<UUID, Player> players = Map.of();
-
 }

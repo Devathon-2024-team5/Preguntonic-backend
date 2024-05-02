@@ -49,7 +49,9 @@ public class Question {
   private Topic topic;
 
   public Answer getCorrectAnswer() {
-    return answers.stream().filter(Answer::isCorrect).findFirst().orElseThrow(() -> new RuntimeException("No correct answer found"));
+    return answers.stream()
+        .filter(Answer::isCorrect)
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException("No correct answer found"));
   }
-
 }

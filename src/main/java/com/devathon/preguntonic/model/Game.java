@@ -5,11 +5,9 @@
  */
 package com.devathon.preguntonic.model;
 
+import com.devathon.preguntonic.domain.Question;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import com.devathon.preguntonic.domain.Question;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

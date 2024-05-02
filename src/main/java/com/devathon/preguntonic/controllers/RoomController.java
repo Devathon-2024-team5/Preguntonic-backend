@@ -7,6 +7,7 @@ package com.devathon.preguntonic.controllers;
 
 import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.LobbyEvent;
+import com.devathon.preguntonic.dto.RoomCodeResponse;
 import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Room;
 import java.util.List;
@@ -26,7 +27,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public interface RoomController {
 
   @PostMapping
-  ResponseEntity<String> createRoom(@RequestBody RoomConfiguration roomConfiguration);
+  ResponseEntity<RoomCodeResponse> createRoom(@RequestBody RoomConfiguration roomConfiguration);
 
   @GetMapping
   ResponseEntity<List<String>> getRooms();

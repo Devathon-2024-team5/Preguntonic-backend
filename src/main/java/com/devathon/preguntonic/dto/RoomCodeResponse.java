@@ -9,6 +9,4 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record RoomConfiguration(
-    @JsonProperty("max_players") int maxPlayers,
-    @JsonProperty("num_of_question") int numberOfQuestions) {}
+public record RoomCodeResponse(@JsonProperty("room_code") String roomCode) {}

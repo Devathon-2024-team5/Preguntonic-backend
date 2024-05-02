@@ -8,6 +8,7 @@ package com.devathon.preguntonic.controllers;
 import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.LobbyEvent;
 import com.devathon.preguntonic.dto.LobbyStatusDto;
+import com.devathon.preguntonic.dto.RoomCodeResponse;
 import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Room;
 import com.devathon.preguntonic.model.RoomEvent;
@@ -36,10 +37,10 @@ public class RoomControllerImpl implements RoomController {
   private final SimpMessagingTemplate messagingTemplate;
 
   @Override
-  public ResponseEntity<String> createRoom(final RoomConfiguration roomConfiguration) {
+  public ResponseEntity<RoomCodeResponse> createRoom(final RoomConfiguration roomConfiguration) {
     final Room room = roomService.createRoom(roomConfiguration);
     log.info("Room created: {}", room);
-    return ResponseEntity.ok(room.getCode());
+    return ResponseEntity.ok(RoomCodeResponse.builder().roomCode(room.getCode()).build());
   }
 
   @Override

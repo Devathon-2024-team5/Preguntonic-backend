@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.devathon.preguntonic.constants.Constants;
 import com.devathon.preguntonic.domain.Question;
 import com.devathon.preguntonic.dto.GameStatusDto;
 import com.devathon.preguntonic.dto.PlayerQuestionResponseDto;
@@ -21,14 +20,18 @@ import com.devathon.preguntonic.model.Player;
 import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import com.devathon.preguntonic.model.RoomStatus;
-import com.devathon.preguntonic.services.DummyRoomService;
 import com.devathon.preguntonic.services.QuestionService;
+import com.devathon.preguntonic.services.RoomService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 public class GameControllerImpl implements GameController {
+
+    private static final int FIRST_QUESTION_ORDINAL = 1;
+    private static final long MAX_MILLISECONDS_TO_ANSWER = 30000;
+    private static final int QUESTION_SCORE = 100;
 
     @Autowired
     private RoomService roomService;
@@ -91,7 +94,7 @@ public class GameControllerImpl implements GameController {
         room.setGame(Game.builder()
             .id(UUID.randomUUID())
             .currentQuestion(question)
-            .currentQuestionOrdinal(Constants.FIRST_QUESTION_ORDINAL)
+            .currentQuestionOrdinal(FIRST_QUESTION_ORDINAL)
             .createdAt(LocalDateTime.now())
             .build());
         
@@ -130,7 +133,7 @@ public class GameControllerImpl implements GameController {
         }
 
         // Check if the timestamp is valid
-        if (response.milliseconds() > Constants.MAX_MILLISECONDS_TO_ANSWER || response.milliseconds() < 0) {
+        if (response.milliseconds() > MAX_MILLISECONDS_TO_ANSWER || response.milliseconds() < 0) {
             log.error("Response time is not valid");
             return null;
         }
@@ -175,7 +178,7 @@ public class GameControllerImpl implements GameController {
             int newScore = 0;
             if (currentPlayer.getResponseId().equals(question.getCorrectAnswer().getId())) {
                 // int score = QUESTION_SCORE * ((numPlayers - i) / numPlayers) + (int) (MAX_MILLISECONDS_TO_ANSWER - currentPlayer.getResponseTime());
-                newScore = (int) (Constants.QUESTION_SCORE * (((float) numPlayers - i) / (float) numPlayers));
+                newScore = (int) (QUESTION_SCORE * (((float) numPlayers - i) / (float) numPlayers));
             } else {
                 newScore = 0;
             }

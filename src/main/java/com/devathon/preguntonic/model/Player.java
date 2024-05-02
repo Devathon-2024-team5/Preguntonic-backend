@@ -16,13 +16,10 @@ public class Player {
     private UUID id;
     private boolean isAdmin;
     private String ipAddress;
-    private String avatar; // TODO: Change to enum if needed
+    private String avatar;
     private String nickname;
     private PlayerStatus status;
     private int score;
-
-    // Transient (lobby)
-    private boolean isReady;
 
     // Transient (game)
     private boolean responded;

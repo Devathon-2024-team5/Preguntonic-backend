@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.devathon.preguntonic.model.Player;
+import com.devathon.preguntonic.model.PlayerStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class PlayerStatusDto {
             .id(player.getId())
             .nickname(player.getNickname())
             .avatar(player.getAvatar())
-            .isReady(player.isReady())
+            .isReady(player.getStatus().equals(PlayerStatus.IN_LOBBY_READY))
             .score(player.getScore())
             .build();
     }

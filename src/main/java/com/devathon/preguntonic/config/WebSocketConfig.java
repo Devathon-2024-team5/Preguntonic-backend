@@ -38,7 +38,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void configureMessageBroker(MessageBrokerRegistry registry) {
     registry
         .setApplicationDestinationPrefixes("/preguntonic") // [1]The prefix for the application destination.
-        .enableSimpleBroker("/"); // [2]Enable the simple broker (some examples of destinations).
+        .enableSimpleBroker("/rooms"); // [2]Enable the simple broker (some examples of destinations).
 
     // Help:
     // [1] The prefix for the application destination is used to filter the messages

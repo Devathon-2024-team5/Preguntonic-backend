@@ -33,11 +33,11 @@ public interface RoomController {
   ResponseEntity<List<String>> getRooms();
 
   @GetMapping("/{roomId}")
-  ResponseEntity<Room> getRoom(@PathVariable String roomId);
+  ResponseEntity<Room> getRoom(@PathVariable("roomId") String roomId);
 
   @PostMapping("/{roomId}/players")
   ResponseEntity<BasicPlayer> addPlayerRoom(
-      @PathVariable String roomId, @RequestBody BasicPlayer player);
+      @PathVariable("roomId") String roomId, @RequestBody BasicPlayer player);
 
   // Websocket endpoints
   @MessageMapping("/rooms/{roomId}/lobby/join")

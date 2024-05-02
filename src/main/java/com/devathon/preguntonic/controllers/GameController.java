@@ -30,7 +30,7 @@ public interface GameController {
      */
     @MessageMapping("/players/{playerId}/join")
     @SendTo("/preguntonic/rooms/{code}/game")
-    public GameStatusDto joinGame(@DestinationVariable String code, @DestinationVariable UUID playerId);
+    public GameStatusDto joinGame(@DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 
     /**
      * Players send when they answer a question

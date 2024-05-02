@@ -39,7 +39,7 @@ public interface GameController {
      */
     @MessageMapping("/players/{playerId}/response")
     @SendTo("/preguntonic/rooms/{code}/game")
-    public QuestionResultDto answerQuestion(@DestinationVariable String code, @DestinationVariable UUID playerId, @Payload PlayerQuestionResponseDto response);
+    public QuestionResultDto answerQuestion(@DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId, @Payload PlayerQuestionResponseDto response);
 
     /**
      * Handle when a player is ready to start the game

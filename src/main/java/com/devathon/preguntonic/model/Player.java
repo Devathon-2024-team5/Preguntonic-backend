@@ -17,7 +17,7 @@ public class Player {
     private boolean isAdmin;
     private String ipAddress;
     private String avatar;
-    private String nickname;
+    private String name;
     private PlayerStatus status;
     private int score;
 

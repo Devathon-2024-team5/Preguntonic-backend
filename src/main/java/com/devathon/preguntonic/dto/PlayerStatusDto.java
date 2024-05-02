@@ -30,7 +30,7 @@ public class PlayerStatusDto {
     public static PlayerStatusDto from(Player player) {
         return PlayerStatusDto.builder()
             .id(player.getId())
-            .nickname(player.getNickname())
+            .nickname(player.getName())
             .avatar(player.getAvatar())
             .isReady(player.getStatus().equals(PlayerStatus.IN_LOBBY_READY))
             .score(player.getScore())

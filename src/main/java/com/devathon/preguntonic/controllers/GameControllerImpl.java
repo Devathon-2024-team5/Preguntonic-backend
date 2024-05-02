@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GameControllerImpl implements GameController {
 
     @Autowired
-    private DummyRoomService roomService;
+    private RoomService roomService;
 
     @Autowired
     private QuestionService questionService;

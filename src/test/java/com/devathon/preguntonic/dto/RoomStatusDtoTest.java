@@ -5,7 +5,7 @@
  */
 package com.devathon.preguntonic.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.devathon.preguntonic.model.RoomStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;

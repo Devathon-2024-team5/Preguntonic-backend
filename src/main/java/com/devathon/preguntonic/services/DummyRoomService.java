@@ -71,4 +71,9 @@ public class DummyRoomService implements RoomService {
     }
     return Optional.empty();
   }
+
+  @Override
+  public void resetGame(String roomCode) {
+    throw new UnsupportedOperationException("Not implemented yet");
+  }
 }

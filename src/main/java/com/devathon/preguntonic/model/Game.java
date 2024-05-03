@@ -23,4 +23,5 @@ public class Game {
   private Question currentQuestion;
   private int currentQuestionOrdinal;
   private LocalDateTime createdAt;
+  private GameStatus status;
 }

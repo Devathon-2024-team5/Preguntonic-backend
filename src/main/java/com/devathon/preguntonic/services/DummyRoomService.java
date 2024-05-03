@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class DummyRoomService implements RoomService {
             .maxPlayers(roomConfiguration.maxPlayers())
             .numQuestions(roomConfiguration.numberOfQuestions())
             .createdAt(LocalDateTime.now())
+            .players(new ArrayList<>())
             .build();
     rooms.add(room);
     return room;
@@ -60,6 +62,26 @@ public class DummyRoomService implements RoomService {
   @Override
   public BasicPlayer joinRoom(final String roomCode, final BasicPlayer player) {
     roomUsers.computeIfAbsent(roomCode, k -> new ArrayList<>()).add(player);
+    int playerId = -1;
+    if (Objects.isNull(player.id())) {
+      playerId = roomUsers.get(roomCode).size();
+    } else {
+      playerId = player.id();
+    }
+    int finalPlayerId = playerId;
+    rooms.stream()
+        .filter(r -> r.getCode().equals(roomCode))
+        .findFirst()
+        .ifPresent(
+            r -> {
+              r.getPlayers()
+                  .add(
+                      Player.builder()
+                          .id(finalPlayerId)
+                          .name(player.name())
+                          .avatarId(player.avatarId())
+                          .build());
+            });
     return player;
   }
 

@@ -97,18 +97,13 @@ public class GameControllerImpl implements GameController {
             .id(UUID.randomUUID())
             .currentQuestion(question)
             .currentQuestionOrdinal(FIRST_QUESTION_ORDINAL)
+            .status(GameStatus.IN_GAME)
             .createdAt(LocalDateTime.now())
             .build());
 
     log.info("All players joined the game in room {}", code);
-    return GameStatusDto.builder()
-        .players(PlayerStatusDto.from(room.getPlayers().values().stream().toList()))
-        .currentQuestion(
-            QuestionDto.from(
-                room.getGame().getCurrentQuestion(), room.getGame().getCurrentQuestionOrdinal()))
-        .numQuestions(room.getNumQuestions())
-        .status(GameStatus.IN_GAME)
-        .build();
+
+    return GameStatusDto.from(room);
   }
 
   @Override
@@ -274,17 +269,67 @@ public class GameControllerImpl implements GameController {
   }
 
   @Override
-  public String exitGame(final String code, final String playerId) {
+  public GameStatusDto exitGame(final String code, final UUID playerId) {
 
-    // TODO: Limpieza de recursos
+    // Check if the room exists
+    Optional<Room> optRoom = roomService.getRoom(code);
+    if (optRoom.isEmpty()) {
+      log.error("Room {} not found", code);
+      return null;
+    }
 
+    Room room = optRoom.get();
+
+    // Check if the player is in the room
+    if (!room.getPlayers().containsKey(playerId)) {
+      log.error("Player {} is not in the room {}", playerId, code);
+      return null;
+    }
+
+    Player player = room.getPlayers().get(playerId);
+
+    room.removePlayer(player.getId());
     log.info("Player {} left the game in room {}", playerId, code);
-    return "left";
+
+    // TODO: Disconnect player from WebSocket
+
+    return GameStatusDto.from(room);
   }
 
   @Override
-  public String replayGame(final String code, final String playerId) {
-    log.info("Player {} is ready to replay the game in room {}", playerId, code);
-    return "replay";
+  public String replayGame(final String code, final UUID playerId) {
+
+    // Check if the room exists
+    Optional<Room> optRoom = roomService.getRoom(code);
+    if (optRoom.isEmpty()) {
+      log.error("Room {} not found", code);
+      return null;
+    }
+
+    Room room = optRoom.get();
+
+    // Check if the player is in the room
+    if (!room.getPlayers().containsKey(playerId)) {
+      log.error("Player {} is not in the room {}", playerId, code);
+      return null;
+    }
+
+    Player player = room.getPlayers().get(playerId);
+
+    // Check if the player is in the results
+    if (player.getStatus() != PlayerStatus.IN_RESULTS) {
+      log.error("Player {} is not in the results", playerId);
+      return null;
+    }
+
+    // Reset score // TODO: Move this logic to RoomService (method: resetGame)
+    player.setScore(0);
+    player.setStatus(PlayerStatus.IN_LOBBY_UNREADY);
+    player.resetResponse();
+    player.setReadyForNextQuestion(false);
+
+    roomService.resetGame(code);
+
+    return "replay"; // TODO: Change to a DTO
   }
 }

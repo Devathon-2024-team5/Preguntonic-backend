@@ -70,7 +70,8 @@ public interface GameController {
    * @return
    */
   @MessageMapping("/players/{playerId}/exit")
-  public String exitGame(@DestinationVariable String code, @DestinationVariable String playerId);
+  public GameStatusDto exitGame(
+      @DestinationVariable String code, @DestinationVariable UUID playerId);
 
   /**
    * Players send when they are ready to re-start the game
@@ -80,5 +81,5 @@ public interface GameController {
    * @return
    */
   @MessageMapping("/players/{playerId}/replay")
-  public String replayGame(@DestinationVariable String code, @DestinationVariable String playerId);
+  public String replayGame(@DestinationVariable String code, @DestinationVariable UUID playerId);
 }

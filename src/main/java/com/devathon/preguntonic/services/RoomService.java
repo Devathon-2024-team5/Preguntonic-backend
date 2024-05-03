@@ -32,4 +32,11 @@ public interface RoomService {
   int joinRoom(String roomCode, String username);
 
   Optional<BasicPlayer> getPlayer(String roomCode, int playerId);
+
+  /**
+   * Reset all params of the game (ready to start again)
+   * 
+   * @param roomCode the room code
+   */
+  void resetGame(String roomCode);
 }

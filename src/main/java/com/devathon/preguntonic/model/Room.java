@@ -6,7 +6,7 @@
 package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,12 +27,15 @@ public class Room {
   private int currentPlayers;
   private int numQuestions;
   private LocalDateTime createdAt;
-  private List<Player> players;
+  @Builder.Default private final Map<UUID, Player> players = Map.of();
 
   public int countReadyPlayers() {
     if (players == null) {
       return 0;
     }
-    return (int) players.stream().filter(Player::isReady).count();
+    return (int)
+        players.values().stream()
+            .filter(player -> player.getStatus() == PlayerStatus.IN_LOBBY_READY)
+            .count();
   }
 }

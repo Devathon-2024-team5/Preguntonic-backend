@@ -9,6 +9,7 @@ import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Game;
 import com.devathon.preguntonic.model.Player;
+import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
@@ -16,9 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,7 +44,7 @@ public class DummyRoomService implements RoomService {
             .maxPlayers(roomConfiguration.maxPlayers())
             .numQuestions(roomConfiguration.numberOfQuestions())
             .createdAt(LocalDateTime.now())
-            .players(new ArrayList<>())
+            .players(new HashMap<>())
             .build();
     rooms.add(room);
     return room;
@@ -62,36 +63,31 @@ public class DummyRoomService implements RoomService {
   @Override
   public BasicPlayer joinRoom(final String roomCode, final BasicPlayer player) {
     roomUsers.computeIfAbsent(roomCode, k -> new ArrayList<>()).add(player);
-    int playerId = -1;
-    if (Objects.isNull(player.id())) {
-      playerId = roomUsers.get(roomCode).size();
-    } else {
-      playerId = player.id();
-    }
+    UUID playerId = Optional.ofNullable(player.id()).orElse(UUID.randomUUID());
 
     var newPlayer =
         Player.builder()
             .id(playerId)
             .name(player.name())
-            .avatarId(player.avatar())
-            .ready(false)
+            .avatar(player.avatar())
+            .status(PlayerStatus.IN_LOBBY_UNREADY)
             .build();
 
     rooms.stream()
         .filter(r -> r.getCode().equals(roomCode))
         .findFirst()
-        .ifPresent(r -> r.getPlayers().add(newPlayer));
+        .ifPresent(r -> r.getPlayers().put(playerId, newPlayer));
 
     return BasicPlayer.builder()
         .id(newPlayer.getId())
-        .avatar(newPlayer.getAvatarId())
+        .avatar(newPlayer.getAvatar())
         .name(newPlayer.getName())
         .build();
   }
 
   @Override
   public BasicPlayer changePlayerReadyStatus(
-      final String roomCode, final int playerId, final boolean ready)
+      final String roomCode, final UUID playerId, final PlayerStatus ready)
       throws InvalidParameterException {
     Optional<Player> playerO = findPlayerInRoom(roomCode, playerId);
 
@@ -100,10 +96,10 @@ public class DummyRoomService implements RoomService {
     }
 
     var player = playerO.get();
-    player.setReady(ready);
+    player.setStatus(ready);
     return BasicPlayer.builder()
         .id(player.getId())
-        .avatar(player.getAvatarId())
+        .avatar(player.getAvatar())
         .name(player.getName())
         .build();
   }
@@ -133,25 +129,26 @@ public class DummyRoomService implements RoomService {
   }
 
   @Override
-  public Optional<BasicPlayer> getPlayer(final String roomCode, final int playerId) {
+  public Optional<BasicPlayer> getPlayer(final String roomCode, final UUID playerId) {
     return findPlayerInRoom(roomCode, playerId)
         .map(
             p ->
                 BasicPlayer.builder()
                     .id(p.getId())
-                    .avatar(p.getAvatarId())
+                    .avatar(p.getAvatar())
                     .name(p.getName())
                     .build());
   }
 
-  private Optional<Player> findPlayerInRoom(String roomCode, int playerId) {
+  private Optional<Player> findPlayerInRoom(final String roomCode, final UUID playerId) {
     return rooms.stream()
         .filter(r -> r.getCode().equals(roomCode))
         .findFirst()
         .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG))
         .getPlayers()
+        .values()
         .stream()
-        .filter(p -> p.getId() == playerId)
+        .filter(p -> p.getId().equals(playerId))
         .findFirst();
   }
 }

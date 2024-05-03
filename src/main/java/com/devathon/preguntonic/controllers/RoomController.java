@@ -11,6 +11,7 @@ import com.devathon.preguntonic.dto.RoomCodeResponse;
 import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Room;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -47,11 +48,11 @@ public interface RoomController {
 
   @MessageMapping("/players/{playerId}/ready")
   ResponseEntity<LobbyEvent> playerReadyInRoom(
-      @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") int playerId);
+      @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 
   @MessageMapping("/players/{playerId}/unready")
   ResponseEntity<LobbyEvent> playerUnReadyInRoom(
-      @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") int playerId);
+      @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 
   @EventListener
   void handleWebSocketConnectListener(SessionConnectEvent event);

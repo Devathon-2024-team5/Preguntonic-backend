@@ -10,11 +10,13 @@ import com.devathon.preguntonic.dto.LobbyEvent;
 import com.devathon.preguntonic.dto.LobbyStatusDto;
 import com.devathon.preguntonic.dto.RoomCodeResponse;
 import com.devathon.preguntonic.dto.RoomConfiguration;
+import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import com.devathon.preguntonic.model.RoomEvent;
 import com.devathon.preguntonic.services.RoomService;
 import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -90,10 +92,10 @@ public class RoomControllerImpl implements RoomController {
   }
 
   @Override
-  public ResponseEntity<LobbyEvent> playerReadyInRoom(final String roomId, final int playerId) {
+  public ResponseEntity<LobbyEvent> playerReadyInRoom(final String roomId, final UUID playerId) {
     log.info("Player {} is ready in room {}", playerId, roomId);
     try {
-      roomService.changePlayerReadyStatus(roomId, playerId, true);
+      roomService.changePlayerReadyStatus(roomId, playerId, PlayerStatus.IN_LOBBY_READY);
     } catch (final InvalidParameterException e) {
       log.warn(PLAYER_READY_ERROR_MSG, e);
       return ResponseEntity.badRequest().build();
@@ -107,11 +109,11 @@ public class RoomControllerImpl implements RoomController {
   }
 
   @Override
-  public ResponseEntity<LobbyEvent> playerUnReadyInRoom(final String roomId, final int playerId) {
+  public ResponseEntity<LobbyEvent> playerUnReadyInRoom(final String roomId, final UUID playerId) {
     log.info("Player {} is unready in room {}", playerId, roomId);
 
     try {
-      roomService.changePlayerReadyStatus(roomId, playerId, false);
+      roomService.changePlayerReadyStatus(roomId, playerId, PlayerStatus.IN_LOBBY_UNREADY);
     } catch (final InvalidParameterException e) {
       log.warn(PLAYER_READY_ERROR_MSG, e);
       return ResponseEntity.badRequest().build();

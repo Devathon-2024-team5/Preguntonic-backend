@@ -8,10 +8,12 @@ package com.devathon.preguntonic.services;
 import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Game;
+import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /** Service to manage rooms */
 public interface RoomService {
@@ -41,10 +43,10 @@ public interface RoomService {
    * @param ready the new ready status
    * @return the player with the new ready status
    */
-  BasicPlayer changePlayerReadyStatus(String roomCode, int playerId, boolean ready)
+  BasicPlayer changePlayerReadyStatus(String roomCode, UUID playerId, PlayerStatus ready)
       throws InvalidParameterException;
 
-  Optional<BasicPlayer> getPlayer(String roomCode, int playerId);
+  Optional<BasicPlayer> getPlayer(String roomCode, UUID playerId);
 
   /**
    * Get the game for a room, if the room does not exist, it will return {@link

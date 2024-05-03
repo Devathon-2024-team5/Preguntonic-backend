@@ -6,27 +6,46 @@
 package com.devathon.preguntonic.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Player {
+
   @JsonProperty("playerId")
-  Integer id;
+  private UUID id;
+
+  private boolean admin;
+  private String ipAddress;
+  private String avatar;
 
   @JsonProperty("playerName")
-  String name;
+  private String name;
 
-  @JsonProperty("avatar")
-  String avatarId;
+  private PlayerStatus status;
+  private int score;
 
-  @JsonProperty("isReady")
-  boolean ready;
+  // Transient (game)
+  private boolean responded;
+  private long responseTime;
+  private UUID responseId;
+  private boolean readyForNextQuestion;
 
-  @JsonProperty("isOwner")
-  boolean owner;
+  public void response(UUID responseId, long responseTime) {
+    this.responseId = responseId;
+    this.responseTime = responseTime;
+    this.responded = true;
+  }
 
-  @JsonProperty("score")
-  Integer score;
+  public void resetResponse() {
+    this.responseId = null;
+    this.responseTime = -1;
+    this.responded = false;
+  }
 }

@@ -7,6 +7,7 @@ package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,5 +38,22 @@ public class Room {
         players.values().stream()
             .filter(player -> player.getStatus() == PlayerStatus.IN_LOBBY_READY)
             .count();
+  }
+
+  public Optional<Player> getPlayer(final UUID playerId) {
+    return Optional.ofNullable(players.get(playerId));
+  }
+
+  public Player addPlayer(final Player player) {
+    players.put(player.getId(), player);
+    return player;
+  }
+
+  public void removePlayer(final UUID playerId) {
+    players.remove(playerId);
+  }
+
+  public void cleanUp() {
+    players.clear();
   }
 }

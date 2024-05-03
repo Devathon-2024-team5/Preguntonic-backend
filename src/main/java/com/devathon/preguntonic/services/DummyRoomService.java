@@ -151,4 +151,9 @@ public class DummyRoomService implements RoomService {
         .filter(p -> p.getId().equals(playerId))
         .findFirst();
   }
+
+  @Override
+  public void resetGame(String roomCode) {
+    throw new UnsupportedOperationException("Not implemented yet");
+  }
 }

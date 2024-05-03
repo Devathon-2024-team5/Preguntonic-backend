@@ -66,4 +66,11 @@ public interface RoomService {
    * @return the game created
    */
   Game createGame(String roomCode) throws InvalidParameterException;
+
+  /**
+   * Reset all params of the game (ready to start again)
+   *
+   * @param roomCode the room code
+   */
+  void resetGame(String roomCode);
 }

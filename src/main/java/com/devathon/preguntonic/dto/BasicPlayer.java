@@ -10,6 +10,6 @@ import lombok.Builder;
 
 @Builder
 public record BasicPlayer(
-    @JsonProperty("player_id") Integer id,
-    @JsonProperty("player_name") String name,
-    @JsonProperty("avatar_id") String avatarId) {}
+    @JsonProperty("playerId") Integer id,
+    @JsonProperty("playerName") String name,
+    @JsonProperty String avatar) {}

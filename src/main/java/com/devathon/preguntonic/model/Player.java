@@ -12,19 +12,19 @@ import lombok.Data;
 @Data
 @Builder
 public class Player {
-  @JsonProperty("player_id")
+  @JsonProperty("playerId")
   Integer id;
 
-  @JsonProperty("player_name")
+  @JsonProperty("playerName")
   String name;
 
-  @JsonProperty("avatar_id")
+  @JsonProperty("avatar")
   String avatarId;
 
-  @JsonProperty("is_ready")
+  @JsonProperty("isReady")
   boolean ready;
 
-  @JsonProperty("is_owner")
+  @JsonProperty("isOwner")
   boolean owner;
 
   @JsonProperty("score")

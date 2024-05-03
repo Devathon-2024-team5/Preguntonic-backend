@@ -73,7 +73,7 @@ public class DummyRoomService implements RoomService {
         Player.builder()
             .id(playerId)
             .name(player.name())
-            .avatarId(player.avatarId())
+            .avatarId(player.avatar())
             .ready(false)
             .build();
 
@@ -84,7 +84,7 @@ public class DummyRoomService implements RoomService {
 
     return BasicPlayer.builder()
         .id(newPlayer.getId())
-        .avatarId(newPlayer.getAvatarId())
+        .avatar(newPlayer.getAvatarId())
         .name(newPlayer.getName())
         .build();
   }
@@ -103,7 +103,7 @@ public class DummyRoomService implements RoomService {
     player.setReady(ready);
     return BasicPlayer.builder()
         .id(player.getId())
-        .avatarId(player.getAvatarId())
+        .avatar(player.getAvatarId())
         .name(player.getName())
         .build();
   }
@@ -139,7 +139,7 @@ public class DummyRoomService implements RoomService {
             p ->
                 BasicPlayer.builder()
                     .id(p.getId())
-                    .avatarId(p.getAvatarId())
+                    .avatar(p.getAvatarId())
                     .name(p.getName())
                     .build());
   }

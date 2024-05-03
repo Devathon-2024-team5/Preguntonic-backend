@@ -24,6 +24,7 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @RequestMapping("/v1/rooms")
+@MessageMapping("/rooms/{roomId}/lobby")
 public interface RoomController {
 
   @PostMapping
@@ -40,15 +41,15 @@ public interface RoomController {
       @PathVariable("roomId") String roomId, @RequestBody BasicPlayer player);
 
   // Websocket endpoints
-  @MessageMapping("/rooms/{roomId}/lobby/join")
+  @MessageMapping("/join")
   ResponseEntity<LobbyEvent> joinRoom(
       @DestinationVariable("roomId") String roomId, BasicPlayer player);
 
-  @MessageMapping("/rooms/{roomId}/lobby/players/{playerId}/ready")
+  @MessageMapping("/players/{playerId}/ready")
   ResponseEntity<LobbyEvent> playerReadyInRoom(
       @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") int playerId);
 
-  @MessageMapping("/rooms/{roomId}/lobby/players/{playerId}/unready")
+  @MessageMapping("/players/{playerId}/unready")
   ResponseEntity<LobbyEvent> playerUnReadyInRoom(
       @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") int playerId);
 

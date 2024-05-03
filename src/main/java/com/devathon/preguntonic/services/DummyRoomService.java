@@ -68,21 +68,25 @@ public class DummyRoomService implements RoomService {
     } else {
       playerId = player.id();
     }
-    int finalPlayerId = playerId;
+
+    var newPlayer =
+        Player.builder()
+            .id(playerId)
+            .name(player.name())
+            .avatarId(player.avatarId())
+            .ready(false)
+            .build();
+
     rooms.stream()
         .filter(r -> r.getCode().equals(roomCode))
         .findFirst()
-        .ifPresent(
-            r -> {
-              r.getPlayers()
-                  .add(
-                      Player.builder()
-                          .id(finalPlayerId)
-                          .name(player.name())
-                          .avatarId(player.avatarId())
-                          .build());
-            });
-    return player;
+        .ifPresent(r -> r.getPlayers().add(newPlayer));
+
+    return BasicPlayer.builder()
+        .id(newPlayer.getId())
+        .avatarId(newPlayer.getAvatarId())
+        .name(newPlayer.getName())
+        .build();
   }
 
   @Override

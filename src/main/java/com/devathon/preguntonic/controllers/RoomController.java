@@ -6,7 +6,7 @@
 package com.devathon.preguntonic.controllers;
 
 import com.devathon.preguntonic.dto.BasicPlayer;
-import com.devathon.preguntonic.dto.PlayerEvent;
+import com.devathon.preguntonic.dto.LobbyEvent;
 import com.devathon.preguntonic.dto.RoomPlayerInitInfo;
 import com.devathon.preguntonic.dto.RoomPlayerInitResponse;
 import com.devathon.preguntonic.model.Room;
@@ -36,15 +36,15 @@ public interface RoomController {
   @GetMapping("/{roomId}")
   ResponseEntity<Room> getRoom(@PathVariable String roomId);
 
-  @MessageMapping("/rooms.join/{roomId}")
-  ResponseEntity<PlayerEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);
+  @MessageMapping("/rooms/{roomId}/lobby/join")
+  ResponseEntity<LobbyEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);
 
-  @MessageMapping("/rooms.ready/{roomId}/{playerId}")
-  ResponseEntity<PlayerEvent> playerReadyInRoom(
+  @MessageMapping("/rooms/{roomId}/lobby/players/{playerId}/ready")
+  ResponseEntity<LobbyEvent> playerReadyInRoom(
       @DestinationVariable String roomId, @DestinationVariable int playerId);
 
-  @MessageMapping("/rooms.unready/{roomId}/{playerId}")
-  ResponseEntity<PlayerEvent> playerUnReadyInRoom(
+  @MessageMapping("/rooms/{roomId}/lobby/players/{playerId}/unready")
+  ResponseEntity<LobbyEvent> playerUnReadyInRoom(
       @DestinationVariable String roomId, @DestinationVariable int playerId);
 
   @EventListener

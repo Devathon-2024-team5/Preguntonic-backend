@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat WebSocket</title>
+  <script src="resources/js/sockjs-0.3.4.js"></script>
+  <script src="resources/js/stomp.js"></script>
+  <script type="text/javascript">
+    var stompClient = null;
+
+    function setConnected(connected) {
+      document.getElementById('connect').disabled = connected;
+      document.getElementById('disconnect').disabled = !connected;
+      document.getElementById('roomId').disabled = connected;
+      document.getElementById('conversationDiv').style.visibility
+          = connected ? 'visible' : 'hidden';
+      document.getElementById('response').innerHTML = '';
+    }
+
+    function connect() {
+      var socket = new SockJS('http://localhost:8080/preguntonic');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function(frame) {
+        setConnected(true);
+        var roomId = document.getElementById('roomId').value;
+        console.log('Connected: ' + frame + " - " + roomId);
+        stompClient.subscribe(`/room/${roomId}`, function(messageOutput) {
+          console.log(messageOutput)
+          showMessageOutput(JSON.parse(messageOutput.body));
+        });
+      });
+    }
+
+    function disconnect() {
+      if(stompClient != null) {
+        stompClient.disconnect();
+      }
+      setConnected(false);
+      console.log("Disconnected");
+    }
+
+    function sendMessage() {
+      var from = document.getElementById('from').value;
+      var text = document.getElementById('text').value;
+      stompClient.send("/app/chat", {},
+          JSON.stringify({'from':from, 'text':text}));
+    }
+
+    function showMessageOutput(messageOutput) {
+      console.log("Objeto parseado:" ,messageOutput)
+      var response = document.getElementById('response');
+      var p = document.createElement('p');
+      p.style.wordWrap = 'break-word';
+      if (messageOutput.event === 'JOIN') {
+        p.appendChild(document.createTextNode(messageOutput.room + ": "
+            + messageOutput.room.max_players + " (" + messageOutput.room.room_code + ")"));
+      }
+
+      response.appendChild(p);
+    }
+
+    function getRooms(){
+      fetch("http://localhost:8080/v1/rooms").then(response => response.json()).then(data => {
+        console.log(data)
+        var roomList = document.getElementById('roomList');
+        roomList.innerHTML = '';
+        data.forEach(room => {
+          var p = document.createElement('p');
+          p.style.wordWrap = 'break-word';
+          p.appendChild(document.createTextNode(room));
+          roomList.appendChild(p);
+        });
+      });
+    }
+
+    function createRoom(){
+      var player_name = document.getElementById('from').value;
+      fetch("http://localhost:8080/v1/rooms", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          max_players: 4,
+          num_of_questions: 10,
+          player_name: player_name,
+          avatar_id: 1
+        })
+      }).then(response => {
+        console.log(response)
+        getRooms();
+      });
+    }
+
+    function joinRoom() {
+      var roomId = document.getElementById('roomId').value;
+      var from = document.getElementById('from').value;
+      console.log(roomId + " - " + from);
+      let response = stompClient.send(`/app/rooms/${roomId}/lobby/join`, {}, JSON.stringify({'player_name': from, 'avatar_id': 1}));
+      console.log("response: " + response);
+    }
+
+    function readyRoom() {
+      var roomId = document.getElementById('roomId').value;
+      var from = document.getElementById('from').value;
+      console.log(roomId + " - " + from)
+      stompClient.send(`/app/rooms/${roomId}/lobby/players/1/ready`, {}, 1);
+    }
+
+    function unReadyRoom() {
+      var roomId = document.getElementById('roomId').value;
+      var from = document.getElementById('from').value;
+      console.log(roomId + " - " + from)
+      stompClient.send(`/app/rooms/${roomId}/lobby/players/1/unready`, {}, 1);
+    }
+  </script>
+</head>
+<body onload="disconnect()">
+<div>
+  <div>
+    <input type="text" id="from" placeholder="Choose a nickname"/>
+    <input type="text" id="roomId" placeholder="Choose a room"/>
+  </div>
+  <br />
+  <p>Rooms:</p>
+  <div id="roomList">
+
+  </div>
+  <div>
+    <button id="get-rooms" onclick="getRooms();">get Rooms</button>
+    <button id="create-rooms" onclick="createRoom();">create Room</button>
+    <button id="join-rooms" onclick="joinRoom();">Join Room</button>
+    <button id="ready-rooms" onclick="readyRoom();">Ready Room</button>
+    <button id="unready-rooms" onclick="unReadyRoom();">Unready Room</button>
+  </div>
+  <div>
+    <button id="connect" onclick="connect();">Connect</button>
+    <button id="disconnect" disabled="disabled" onclick="disconnect();">
+      Disconnect
+    </button>
+  </div>
+  <br />
+  <div id="conversationDiv">
+    <input type="text" id="text" placeholder="Write a message..."/>
+    <button id="sendMessage" onclick="sendMessage();">Send</button>
+    <p id="response"></p>
+  </div>
+</div>
+
+</body>
+</html>

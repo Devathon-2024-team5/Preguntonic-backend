@@ -8,6 +8,7 @@ package com.devathon.preguntonic.services;
 import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Game;
+import com.devathon.preguntonic.model.Player;
 import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import java.security.InvalidParameterException;
@@ -29,10 +30,10 @@ public interface RoomService {
    * room does not exist, it will return {@link InvalidParameterException}
    *
    * @param roomCode the room code
-   * @param username the username
-   * @return the player id assigned to the new user in the room
+   * @param playerInfo the playerInfo
+   * @return the playerInfo id assigned to the new user in the room
    */
-  BasicPlayer joinRoom(String roomCode, BasicPlayer username) throws InvalidParameterException;
+  BasicPlayer joinRoom(String roomCode, BasicPlayer playerInfo) throws InvalidParameterException;
 
   /**
    * Change the ready status of a player in a room, if room or player does not exist, it will return
@@ -46,7 +47,24 @@ public interface RoomService {
   BasicPlayer changePlayerReadyStatus(String roomCode, UUID playerId, PlayerStatus ready)
       throws InvalidParameterException;
 
-  Optional<BasicPlayer> getPlayer(String roomCode, UUID playerId);
+  /**
+   * Get the player for a room, if the room does not exist, it will return Optional.Empty
+   *
+   * @param roomCode the room code
+   * @param playerId the player id
+   * @return the player
+   */
+  Optional<Player> getPlayer(String roomCode, UUID playerId);
+
+  /**
+   * Get the basic player for a room, if the room or player does not exist, it will return
+   * Optional.Empty
+   *
+   * @param roomCode the room code
+   * @param playerId the player id
+   * @return the basic player
+   */
+  Optional<BasicPlayer> getBasicPlayer(String roomCode, UUID playerId);
 
   /**
    * Get the game for a room, if the room does not exist, it will return {@link
@@ -73,4 +91,6 @@ public interface RoomService {
    * @param roomCode the room code
    */
   void resetGame(String roomCode);
+
+  boolean roomContainsPlayer(String roomCode, UUID playerId);
 }

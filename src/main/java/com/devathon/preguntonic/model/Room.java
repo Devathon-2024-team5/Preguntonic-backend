@@ -6,12 +6,15 @@
 package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -28,7 +31,10 @@ public class Room {
   private int currentPlayers;
   private int numQuestions;
   private LocalDateTime createdAt;
-  @Builder.Default private final Map<UUID, Player> players = Map.of();
+
+  @Getter(AccessLevel.NONE)
+  @Builder.Default
+  private Map<UUID, Player> players = Map.of();
 
   public int countReadyPlayers() {
     if (players == null) {
@@ -49,8 +55,17 @@ public class Room {
     return player;
   }
 
-  public void removePlayer(final UUID playerId) {
-    players.remove(playerId);
+  public Player removePlayer(final UUID playerId) {
+    return players.remove(playerId);
+  }
+
+  /**
+   * Get the players in the room
+   *
+   * @return the players in the room
+   */
+  public List<Player> getPlayers() {
+    return List.copyOf(players.values());
   }
 
   public void cleanUp() {

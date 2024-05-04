@@ -20,7 +20,7 @@ public record GameStatusDto(
 
   public static GameStatusDto from(Room room) {
     return GameStatusDto.builder()
-        .players(PlayerStatusDto.from(room.getPlayers().values().stream().toList()))
+        .players(PlayerStatusDto.from(room.getPlayers()))
         .currentQuestion(
             QuestionDto.from(
                 room.getGame().getCurrentQuestion(), room.getGame().getCurrentQuestionOrdinal()))

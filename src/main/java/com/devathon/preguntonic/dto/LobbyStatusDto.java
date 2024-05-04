@@ -28,11 +28,7 @@ public record LobbyStatusDto(
     var readyPlayers = room.countReadyPlayers();
     var roomStatus = calculateRoomStatus(room, readyPlayers);
     return new LobbyStatusDto(
-        room.getPlayers().values().stream().toList(),
-        readyPlayers,
-        room.getMaxPlayers(),
-        room.getCode(),
-        roomStatus);
+        room.getPlayers(), readyPlayers, room.getMaxPlayers(), room.getCode(), roomStatus);
   }
 
   private static RoomStatus calculateRoomStatus(final Room room, final int readyPlayers) {

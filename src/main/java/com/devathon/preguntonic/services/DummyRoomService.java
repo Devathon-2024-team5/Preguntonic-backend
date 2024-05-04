@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -29,11 +28,9 @@ public class DummyRoomService implements RoomService {
   private static final Random random = new Random();
   private static final String ROOM_NOT_FOUND_MSG = "Room not found";
   private final List<Room> rooms;
-  private final Map<String, List<BasicPlayer>> roomUsers;
 
   public DummyRoomService() {
     this.rooms = new ArrayList<>();
-    this.roomUsers = new HashMap<>();
   }
 
   @Override
@@ -62,22 +59,21 @@ public class DummyRoomService implements RoomService {
   }
 
   @Override
-  public BasicPlayer joinRoom(final String roomCode, final BasicPlayer player) {
-    //    roomUsers.computeIfAbsent(roomCode, k -> new ArrayList<>()).add(player);
-    UUID playerId = Optional.ofNullable(player.id()).orElse(UUID.randomUUID());
+  public BasicPlayer joinRoom(final String roomCode, final BasicPlayer playerInfo) {
+    UUID playerId = Optional.ofNullable(playerInfo.id()).orElse(UUID.randomUUID());
 
     var newPlayer =
         Player.builder()
             .id(playerId)
-            .name(player.name())
-            .avatar(player.avatar())
+            .name(playerInfo.name())
+            .avatar(playerInfo.avatar())
             .status(PlayerStatus.IN_LOBBY_UNREADY)
             .build();
-    if (Objects.isNull(player.id())) {
+    if (Objects.isNull(playerInfo.id())) {
       rooms.stream()
           .filter(r -> r.getCode().equals(roomCode))
           .findFirst()
-          .ifPresent(r -> r.getPlayers().put(playerId, newPlayer));
+          .ifPresent(r -> r.addPlayer(newPlayer));
     }
     return BasicPlayer.builder()
         .id(newPlayer.getId())
@@ -130,7 +126,12 @@ public class DummyRoomService implements RoomService {
   }
 
   @Override
-  public Optional<BasicPlayer> getPlayer(final String roomCode, final UUID playerId) {
+  public Optional<Player> getPlayer(final String roomCode, final UUID playerId) {
+    return findPlayerInRoom(roomCode, playerId);
+  }
+
+  @Override
+  public Optional<BasicPlayer> getBasicPlayer(final String roomCode, final UUID playerId) {
     return findPlayerInRoom(roomCode, playerId)
         .map(
             p ->
@@ -146,15 +147,22 @@ public class DummyRoomService implements RoomService {
         .filter(r -> r.getCode().equals(roomCode))
         .findFirst()
         .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG))
-        .getPlayers()
-        .values()
-        .stream()
-        .filter(p -> p.getId().equals(playerId))
-        .findFirst();
+        .getPlayer(playerId);
   }
 
   @Override
-  public void resetGame(String roomCode) {
+  public void resetGame(final String roomCode) {
     throw new UnsupportedOperationException("Not implemented yet");
+  }
+
+  @Override
+  public boolean roomContainsPlayer(final String roomCode, final UUID playerId) {
+    return rooms.stream()
+        .filter(r -> r.getCode().equals(roomCode))
+        .findFirst()
+        .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG))
+        .getPlayers()
+        .stream()
+        .anyMatch(p -> p.getId().equals(playerId));
   }
 }

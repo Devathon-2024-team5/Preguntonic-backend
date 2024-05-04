@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -62,7 +63,7 @@ public class DummyRoomService implements RoomService {
 
   @Override
   public BasicPlayer joinRoom(final String roomCode, final BasicPlayer player) {
-    roomUsers.computeIfAbsent(roomCode, k -> new ArrayList<>()).add(player);
+    //    roomUsers.computeIfAbsent(roomCode, k -> new ArrayList<>()).add(player);
     UUID playerId = Optional.ofNullable(player.id()).orElse(UUID.randomUUID());
 
     var newPlayer =
@@ -72,12 +73,12 @@ public class DummyRoomService implements RoomService {
             .avatar(player.avatar())
             .status(PlayerStatus.IN_LOBBY_UNREADY)
             .build();
-
-    rooms.stream()
-        .filter(r -> r.getCode().equals(roomCode))
-        .findFirst()
-        .ifPresent(r -> r.getPlayers().put(playerId, newPlayer));
-
+    if (Objects.isNull(player.id())) {
+      rooms.stream()
+          .filter(r -> r.getCode().equals(roomCode))
+          .findFirst()
+          .ifPresent(r -> r.getPlayers().put(playerId, newPlayer));
+    }
     return BasicPlayer.builder()
         .id(newPlayer.getId())
         .avatar(newPlayer.getAvatar())

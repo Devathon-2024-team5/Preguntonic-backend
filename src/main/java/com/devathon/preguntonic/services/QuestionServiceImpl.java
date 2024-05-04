@@ -9,13 +9,12 @@ import com.devathon.preguntonic.domain.Question;
 import com.devathon.preguntonic.repositories.QuestionRepository;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
-  @Autowired private QuestionRepository repository;
+  private QuestionRepository repository;
 
   @Override
   public Optional<Question> getQuestionById(UUID id) {

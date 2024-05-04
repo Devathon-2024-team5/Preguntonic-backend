@@ -23,21 +23,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class GameControllerImpl implements GameController {
 
   private static final int FIRST_QUESTION_ORDINAL = 1;
   private static final long MAX_MILLISECONDS_TO_ANSWER = 30000;
   private static final int QUESTION_SCORE = 100;
 
-  @Autowired private RoomService roomService;
+  private RoomService roomService;
 
-  @Autowired private QuestionService questionService;
+  private QuestionService questionService;
 
   @Override
   public void gameSubscription(final String code) {

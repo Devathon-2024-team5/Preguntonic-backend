@@ -106,7 +106,20 @@ public class RoomControllerImpl implements RoomController {
     }
 
     var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.READY);
+
+    if (isGameReadyToStart(roomId)) {
+      sentLobbyEventToRoomTopic(roomId, RoomEvent.START_GAME);
+    }
+
     return ResponseEntity.ok(lobbyEvent);
+  }
+
+  private boolean isGameReadyToStart(final String roomId) {
+    var room =
+        roomService
+            .getRoom(roomId)
+            .orElseThrow(() -> new InvalidParameterException("Room not found"));
+    return room.countReadyPlayers() == room.getMaxPlayers();
   }
 
   @Override

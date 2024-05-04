@@ -35,6 +35,7 @@ public class RoomControllerImpl implements RoomController {
   private static final String ROOM_NOT_FOUND = "Room {} not found";
   private static final String PLAYER_READY_ERROR_MSG = "Error changing player ready status";
   private static final String ERROR_JOINING_ROOM_MSG = "Error joining room";
+
   private final RoomService roomService;
   private final SimpMessagingTemplate messagingTemplate;
 

@@ -6,6 +6,7 @@
 package com.devathon.preguntonic.model;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class Room {
 
   @Getter(AccessLevel.NONE)
   @Builder.Default
-  private Map<UUID, Player> players = Map.of();
+  private Map<UUID, Player> players = new HashMap<>(Map.of());
 
   public int countReadyPlayers() {
     if (players == null) {

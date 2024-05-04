@@ -20,8 +20,12 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
+@Primary
 @AllArgsConstructor
 public class RoomServiceImpl implements RoomService {
 

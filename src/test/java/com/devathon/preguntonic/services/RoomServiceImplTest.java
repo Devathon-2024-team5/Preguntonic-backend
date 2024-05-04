@@ -15,7 +15,6 @@ import com.devathon.preguntonic.namegenerator.PrefixedRandomRoomCodeGenerator;
 import com.devathon.preguntonic.namegenerator.RoomCodeGenerator;
 import com.devathon.preguntonic.storage.MemoryRoomStorage;
 import com.devathon.preguntonic.storage.RoomStorage;
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,7 @@ class RoomServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    roomStorage = MemoryRoomStorage.builder().rooms(new HashMap<>()).build();
+    roomStorage = MemoryRoomStorage.builder().build();
     roomCodeGenerator = new PrefixedRandomRoomCodeGenerator("ROOM");
     roomService = new RoomServiceImpl(roomStorage, roomCodeGenerator);
   }

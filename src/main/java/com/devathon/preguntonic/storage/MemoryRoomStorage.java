@@ -7,10 +7,12 @@ package com.devathon.preguntonic.storage;
 
 import com.devathon.preguntonic.model.Player;
 import com.devathon.preguntonic.model.Room;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 /** Memory implementation of the {@link RoomStorage} interface. */
 @Slf4j
 @Builder
+@AllArgsConstructor
 public class MemoryRoomStorage implements RoomStorage {
 
   private static final String ROOM_NOT_FOUND = "Room not found: {}";
-  @Default private Map<String, Room> rooms = Map.of();
+  @Default private Map<String, Room> rooms = new HashMap<>(Map.of());
 
   @Override
   public void saveRoom(final Room room) {

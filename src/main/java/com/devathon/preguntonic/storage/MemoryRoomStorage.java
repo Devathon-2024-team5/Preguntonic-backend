@@ -82,6 +82,12 @@ public class MemoryRoomStorage implements RoomStorage {
     }
 
     Room room = rooms.get(roomCode);
+
+    if (room.isFull()) {
+      log.warn("Room is full: {}", room);
+      return Optional.empty();
+    }
+
     Player playerSaved = room.addPlayer(player);
     log.info("Player added to room: {}", playerSaved);
     return Optional.of(playerSaved);

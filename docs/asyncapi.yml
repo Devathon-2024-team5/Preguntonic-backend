@@ -3,12 +3,11 @@ info:
   title: Preguntonic API
   version: 1.0.0
   description: |-
-    Preguntonic is a simple API that allows you to ask questions and get answers in real-time.
-    With Preguntonic you can:
+    Preguntonic is a real-time API designed for interactive Q&A sessions. It offers a dynamic platform where you can:
 
-    - Ask questions.
-    - Get answers in real-time.
-    - Play with your friends.
+    - Pose questions to a wide audience.
+    - Handle immediate responses from participants.
+    - Engage in fun and informative games with your friends.
 
 servers:
   main:

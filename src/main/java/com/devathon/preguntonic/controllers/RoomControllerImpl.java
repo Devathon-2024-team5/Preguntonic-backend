@@ -51,7 +51,7 @@ public class RoomControllerImpl implements RoomController {
   public ResponseEntity<BasicPlayer> addPlayerRoom(final String roomId, final BasicPlayer player) {
     log.info("Adding player {} to room {}", player.name(), roomId);
     try {
-      return ResponseEntity.ok(roomService.joinRoom(roomId, player));
+      return ResponseEntity.ok(roomService.addRoom(roomId, player));
     } catch (final Exception e) {
       log.warn(ERROR_JOINING_ROOM_MSG, e);
       return ResponseEntity.badRequest().build();

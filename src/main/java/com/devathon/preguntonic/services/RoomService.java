@@ -26,14 +26,24 @@ public interface RoomService {
   Optional<Room> getRoom(String roomCode);
 
   /**
-   * Join a room, we are going to add a new user to the room and assign a playerId to it. if the
-   * room does not exist, it will return {@link InvalidParameterException}
+   * Join a room, we are going to change the player status. if room or player does not exist, it
+   * will return {@link InvalidParameterException}
    *
    * @param roomCode the room code
    * @param playerInfo the playerInfo
    * @return the playerInfo id assigned to the new user in the room
    */
   BasicPlayer joinRoom(String roomCode, BasicPlayer playerInfo) throws InvalidParameterException;
+
+  /**
+   * Add a new player to the room and assign a playerId to it. if the room does not exist, it will
+   * return {@link InvalidParameterException}
+   *
+   * @param roomCode the room code
+   * @param playerInfo the playerInfo
+   * @return the playerInfo id assigned to the new user in the room
+   */
+  BasicPlayer addRoom(String roomCode, BasicPlayer playerInfo) throws InvalidParameterException;
 
   /**
    * Change the ready status of a player in a room, if room or player does not exist, it will return

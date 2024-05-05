@@ -33,7 +33,7 @@ public interface GameController {
    * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/join")
-  @SendTo("/app/rooms/{code}/game")
+  @SendTo("/room/{code}/game")
   GameStatusDto joinGame(
       @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 
@@ -44,7 +44,7 @@ public interface GameController {
    * @return QuestionResultDto if all players answered, null otherwise
    */
   @MessageMapping("/players/{playerId}/response")
-  @SendTo("/app/rooms/{code}/game")
+  @SendTo("/room/{code}/game")
   QuestionResultDto answerQuestion(
       @DestinationVariable("code") String code,
       @DestinationVariable("playerId") UUID playerId,
@@ -58,7 +58,7 @@ public interface GameController {
    * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/next")
-  @SendTo("/app/rooms/{code}/game")
+  @SendTo("/room/{code}/game")
   GameStatusDto nextQuestion(
       @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 

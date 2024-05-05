@@ -10,6 +10,7 @@ import com.devathon.preguntonic.dto.LobbyEvent;
 import com.devathon.preguntonic.dto.LobbyStatusDto;
 import com.devathon.preguntonic.dto.RoomCodeResponse;
 import com.devathon.preguntonic.dto.RoomConfiguration;
+import com.devathon.preguntonic.model.Player;
 import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import com.devathon.preguntonic.model.RoomEvent;
@@ -58,8 +59,13 @@ public class RoomControllerImpl implements RoomController {
   }
 
   @Override
-  public ResponseEntity<List<String>> getRooms() {
-    return ResponseEntity.ok(roomService.getRooms().stream().map(Room::getCode).toList());
+  public ResponseEntity<List<Player>> getPlayersInRoom(final String roomId) {
+    return ResponseEntity.ok(roomService.getPlayersInRoom(roomId));
+  }
+
+  @Override
+  public ResponseEntity<List<Room>> getRooms() {
+    return ResponseEntity.ok(roomService.getRooms());
   }
 
   @Override

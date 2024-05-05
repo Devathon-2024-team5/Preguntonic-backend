@@ -12,5 +12,6 @@ public enum RoomEvent {
   JOIN,
   LEAVE,
   READY,
-  UNREADY;
+  UNREADY,
+  START_GAME,
 }

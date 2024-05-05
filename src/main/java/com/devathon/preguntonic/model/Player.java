@@ -5,6 +5,7 @@
  */
 package com.devathon.preguntonic.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,11 +18,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Player {
 
+  @JsonProperty("playerId")
   private UUID id;
-  private boolean isAdmin;
+
+  private boolean admin;
   private String ipAddress;
   private String avatar;
+
+  @JsonProperty("playerName")
   private String name;
+
   private PlayerStatus status;
   private int score;
 

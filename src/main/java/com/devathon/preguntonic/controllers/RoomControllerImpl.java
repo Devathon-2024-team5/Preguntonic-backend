@@ -6,13 +6,17 @@
 package com.devathon.preguntonic.controllers;
 
 import com.devathon.preguntonic.dto.BasicPlayer;
-import com.devathon.preguntonic.dto.PlayerEvent;
-import com.devathon.preguntonic.dto.RoomPlayerInitInfo;
-import com.devathon.preguntonic.dto.RoomPlayerInitResponse;
+import com.devathon.preguntonic.dto.LobbyEvent;
+import com.devathon.preguntonic.dto.LobbyStatusDto;
+import com.devathon.preguntonic.dto.RoomCodeResponse;
+import com.devathon.preguntonic.dto.RoomConfiguration;
+import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
 import com.devathon.preguntonic.model.RoomEvent;
 import com.devathon.preguntonic.services.RoomService;
+import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,17 +32,29 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public class RoomControllerImpl implements RoomController {
 
   private static final String ROOM_DESTINATION_BASE_PATH = "/room/";
+  private static final String ROOM_NOT_FOUND = "Room {} not found";
+  private static final String PLAYER_READY_ERROR_MSG = "Error changing player ready status";
+  private static final String ERROR_JOINING_ROOM_MSG = "Error joining room";
+
   private final RoomService roomService;
   private final SimpMessagingTemplate messagingTemplate;
 
   @Override
-  public ResponseEntity<RoomPlayerInitResponse> createRoom(
-      final RoomPlayerInitInfo roomPlayerInitInfo) {
-    final RoomPlayerInitResponse roomPlayerInitResponse =
-        roomService.createRoom(roomPlayerInitInfo);
-    log.info("Room created: {}", roomPlayerInitResponse);
+  public ResponseEntity<RoomCodeResponse> createRoom(final RoomConfiguration roomConfiguration) {
+    final Room room = roomService.createRoom(roomConfiguration);
+    log.info("Room created: {}", room);
+    return ResponseEntity.ok(RoomCodeResponse.builder().roomCode(room.getCode()).build());
+  }
 
-    return ResponseEntity.ok(roomPlayerInitResponse);
+  @Override
+  public ResponseEntity<BasicPlayer> addPlayerRoom(final String roomId, final BasicPlayer player) {
+    log.info("Adding player {} to room {}", player.name(), roomId);
+    try {
+      return ResponseEntity.ok(roomService.joinRoom(roomId, player));
+    } catch (final Exception e) {
+      log.warn(ERROR_JOINING_ROOM_MSG, e);
+      return ResponseEntity.badRequest().build();
+    }
   }
 
   @Override
@@ -52,59 +68,92 @@ public class RoomControllerImpl implements RoomController {
         .getRoom(roomId)
         .map(
             room -> {
-              log.info("Room found: {}", room);
+              log.info(ROOM_NOT_FOUND, room);
               return ResponseEntity.ok(room);
             })
         .orElse(ResponseEntity.notFound().build());
   }
 
   @Override
-  public ResponseEntity<PlayerEvent> joinRoom(final String roomId, final BasicPlayer player) {
+  public ResponseEntity<LobbyEvent> joinRoom(final String roomId, final BasicPlayer player) {
     log.info("Joining room {} with user {}", roomId, player.name());
-    if (roomService.getRoom(roomId).isEmpty()) {
-      log.info("Room {} not found", roomId);
-      return ResponseEntity.notFound().build();
+    try {
+      BasicPlayer playerResponse = roomService.joinRoom(roomId, player);
+      log.info("Player {} joined room {}", playerResponse.id(), roomId);
+    } catch (final InvalidParameterException e) {
+      log.warn(ERROR_JOINING_ROOM_MSG, e);
+      return ResponseEntity.badRequest().build();
+    } catch (final Exception e) {
+      log.warn(ERROR_JOINING_ROOM_MSG, e);
+      return ResponseEntity.internalServerError().build();
     }
 
-    int playerId = roomService.joinRoom(roomId, player.name());
-    BasicPlayer playerWithId = new BasicPlayer(playerId, player.name(), player.avatarId());
-
-    PlayerEvent playerEvent =
-        PlayerEvent.builder().player(playerWithId).event(RoomEvent.JOIN.name()).build();
-    messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, playerEvent);
-
-    log.info("Player {} joined room {}", playerId, roomId);
-    return ResponseEntity.ok(playerEvent);
+    var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.JOIN);
+    return ResponseEntity.ok(lobbyEvent);
   }
 
   @Override
-  public ResponseEntity<PlayerEvent> playerReadyInRoom(final String roomId, final int playerId) {
+  public ResponseEntity<LobbyEvent> playerReadyInRoom(final String roomId, final UUID playerId) {
     log.info("Player {} is ready in room {}", playerId, roomId);
+    try {
+      roomService.changePlayerReadyStatus(roomId, playerId, PlayerStatus.IN_LOBBY_READY);
+    } catch (final InvalidParameterException e) {
+      log.warn(PLAYER_READY_ERROR_MSG, e);
+      return ResponseEntity.badRequest().build();
+    } catch (final Exception e) {
+      log.warn(PLAYER_READY_ERROR_MSG, e);
+      return ResponseEntity.internalServerError().build();
+    }
 
-    PlayerEvent playerEvent = buildPlayerEvent(roomId, playerId, RoomEvent.READY);
+    var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.READY);
 
-    messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, playerEvent);
-    return ResponseEntity.ok(playerEvent);
+    if (isGameReadyToStart(roomId)) {
+      sentLobbyEventToRoomTopic(roomId, RoomEvent.START_GAME);
+    }
+
+    return ResponseEntity.ok(lobbyEvent);
+  }
+
+  private boolean isGameReadyToStart(final String roomId) {
+    var room =
+        roomService
+            .getRoom(roomId)
+            .orElseThrow(() -> new InvalidParameterException("Room not found"));
+    return room.countReadyPlayers() == room.getMaxPlayers();
   }
 
   @Override
-  public ResponseEntity<PlayerEvent> playerUnReadyInRoom(final String roomId, final int playerId) {
+  public ResponseEntity<LobbyEvent> playerUnReadyInRoom(final String roomId, final UUID playerId) {
     log.info("Player {} is unready in room {}", playerId, roomId);
 
-    PlayerEvent playerEvent = buildPlayerEvent(roomId, playerId, RoomEvent.UNREADY);
+    try {
+      roomService.changePlayerReadyStatus(roomId, playerId, PlayerStatus.IN_LOBBY_UNREADY);
+    } catch (final InvalidParameterException e) {
+      log.warn(PLAYER_READY_ERROR_MSG, e);
+      return ResponseEntity.badRequest().build();
+    } catch (final Exception e) {
+      log.warn(PLAYER_READY_ERROR_MSG, e);
+      return ResponseEntity.internalServerError().build();
+    }
 
-    messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, playerEvent);
-    return ResponseEntity.ok(playerEvent);
+    var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.UNREADY);
+    return ResponseEntity.ok(lobbyEvent);
   }
 
-  private PlayerEvent buildPlayerEvent(
-      final String roomId, final int playerId, final RoomEvent roomEvent) {
-    BasicPlayer player =
-        roomService
-            .getPlayer(roomId, playerId)
-            .orElseThrow(() -> new IllegalArgumentException("Player not found"));
-
-    return PlayerEvent.builder().player(player).event(roomEvent.name()).build();
+  private LobbyEvent sentLobbyEventToRoomTopic(final String roomId, final RoomEvent roomEvent) {
+    return roomService
+        .getRoom(roomId)
+        .map(
+            room -> {
+              var lobbyEvent =
+                  LobbyEvent.builder()
+                      .event(roomEvent)
+                      .roomStatus(LobbyStatusDto.from(room))
+                      .build();
+              messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, lobbyEvent);
+              return lobbyEvent;
+            })
+        .orElse(LobbyEvent.builder().build());
   }
 
   @Override

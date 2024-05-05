@@ -23,21 +23,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class GameControllerImpl implements GameController {
 
   private static final int FIRST_QUESTION_ORDINAL = 1;
   private static final long MAX_MILLISECONDS_TO_ANSWER = 30000;
   private static final int QUESTION_SCORE = 100;
 
-  @Autowired private RoomService roomService;
+  private RoomService roomService;
 
-  @Autowired private QuestionService questionService;
+  private QuestionService questionService;
 
   @Override
   public void gameSubscription(final String code) {
@@ -65,12 +66,12 @@ public class GameControllerImpl implements GameController {
     Room room = optRoom.get();
 
     // Check if the player is already in the room
-    if (!room.getPlayers().containsKey(playerId)) {
+    if (!roomService.roomContainsPlayer(code, playerId)) {
       log.error("Player {} is not in the room {}", playerId, code);
       return null;
     }
 
-    Player player = room.getPlayers().get(playerId);
+    Player player = roomService.getPlayer(code, playerId).get();
 
     // Check if player is already joined
     if (player.getStatus() == PlayerStatus.IN_GAME) {
@@ -82,7 +83,7 @@ public class GameControllerImpl implements GameController {
 
     // Check if all players are ready to start the game
     boolean allReadyPlayersJoined =
-        room.getPlayers().values().stream().allMatch(p -> p.getStatus() == PlayerStatus.IN_GAME);
+        room.getPlayers().stream().allMatch(p -> p.getStatus() == PlayerStatus.IN_GAME);
 
     if (!allReadyPlayersJoined) {
       return null;
@@ -120,7 +121,7 @@ public class GameControllerImpl implements GameController {
     Room room = optRoom.get();
 
     // Check if the player is already in the room
-    if (!room.getPlayers().containsKey(playerId)) {
+    if (!roomService.roomContainsPlayer(code, playerId)) {
       log.error("Player {} is not in the room {}", playerId, code);
       return null;
     }
@@ -159,16 +160,16 @@ public class GameControllerImpl implements GameController {
     }
 
     // Response
-    Player player = room.getPlayers().get(playerId);
+    Player player = roomService.getPlayer(code, playerId).get();
     player.response(response.responseId(), response.milliseconds());
 
-    boolean allPlayersAnswered = room.getPlayers().values().stream().allMatch(p -> p.isResponded());
+    boolean allPlayersAnswered = room.getPlayers().stream().allMatch(p -> p.isResponded());
 
     if (!allPlayersAnswered) {
       return null;
     }
 
-    List<Player> players = room.getPlayers().values().stream().toList();
+    List<Player> players = room.getPlayers().stream().toList();
     List<Player> playersAnswered = players.stream().filter(p -> p.isResponded()).toList();
     List<Player> orderedPlayers =
         playersAnswered.stream()
@@ -196,7 +197,7 @@ public class GameControllerImpl implements GameController {
     log.info("All players answered the question in room {}", code);
     return QuestionResultDto.builder()
         .question(QuestionDto.from(question, room.getGame().getCurrentQuestionOrdinal()))
-        .players(PlayerStatusDto.from(room.getPlayers().values().stream().toList()))
+        .players(PlayerStatusDto.from(room.getPlayers().stream().toList()))
         .correctAnswerId(question.getCorrectAnswer().getId())
         .build();
   }
@@ -214,24 +215,24 @@ public class GameControllerImpl implements GameController {
     Room room = optRoom.get();
 
     // Check if the player is in the room
-    if (!room.getPlayers().containsKey(playerId)) {
+    if (!roomService.roomContainsPlayer(code, playerId)) {
       log.error("Player {} is not in the room {}", playerId, code);
       return null;
     }
 
-    Player player = room.getPlayers().get(playerId);
+    Player player = roomService.getPlayer(code, playerId).get();
     player.setReadyForNextQuestion(true);
 
     // Check if all players are ready to next question
     boolean allReadyPlayersNext =
-        room.getPlayers().values().stream().allMatch(p -> p.isReadyForNextQuestion());
+        room.getPlayers().stream().allMatch(Player::isReadyForNextQuestion);
 
     if (!allReadyPlayersNext) {
       return null;
     }
 
     log.info("All players are ready for the next question in room {}", code);
-    room.getPlayers().values().forEach(p -> p.setReadyForNextQuestion(false));
+    room.getPlayers().forEach(p -> p.setReadyForNextQuestion(false));
 
     // Check if there are more questions
     boolean thereAreMoreQuestions =
@@ -247,7 +248,7 @@ public class GameControllerImpl implements GameController {
       room.getGame().setCurrentQuestionOrdinal(room.getGame().getCurrentQuestionOrdinal() + 1);
 
       return GameStatusDto.builder()
-          .players(PlayerStatusDto.from(room.getPlayers().values().stream().toList()))
+          .players(PlayerStatusDto.from(room.getPlayers().stream().toList()))
           .currentQuestion(QuestionDto.from(question, room.getGame().getCurrentQuestionOrdinal()))
           .numQuestions(room.getNumQuestions())
           .status(GameStatus.IN_GAME)
@@ -256,11 +257,11 @@ public class GameControllerImpl implements GameController {
 
       log.info("There are no more questions in room {}", code);
 
-      room.getPlayers().values().forEach(p -> p.setStatus(PlayerStatus.IN_RESULTS));
+      room.getPlayers().forEach(p -> p.setStatus(PlayerStatus.IN_RESULTS));
       room.setStatus(RoomStatus.FINISHED);
 
       return GameStatusDto.builder()
-          .players(PlayerStatusDto.from(room.getPlayers().values().stream().toList()))
+          .players(PlayerStatusDto.from(room.getPlayers().stream().toList()))
           .currentQuestion(null)
           .numQuestions(room.getNumQuestions())
           .status(GameStatus.FINISHED)
@@ -281,12 +282,12 @@ public class GameControllerImpl implements GameController {
     Room room = optRoom.get();
 
     // Check if the player is in the room
-    if (!room.getPlayers().containsKey(playerId)) {
+    if (!roomService.roomContainsPlayer(code, playerId)) {
       log.error("Player {} is not in the room {}", playerId, code);
       return null;
     }
 
-    Player player = room.getPlayers().get(playerId);
+    Player player = roomService.getPlayer(code, playerId).get();
 
     room.removePlayer(player.getId());
     log.info("Player {} left the game in room {}", playerId, code);
@@ -309,12 +310,12 @@ public class GameControllerImpl implements GameController {
     Room room = optRoom.get();
 
     // Check if the player is in the room
-    if (!room.getPlayers().containsKey(playerId)) {
+    if (!roomService.roomContainsPlayer(code, playerId)) {
       log.error("Player {} is not in the room {}", playerId, code);
       return null;
     }
 
-    Player player = room.getPlayers().get(playerId);
+    Player player = roomService.getPlayer(code, playerId).get();
 
     // Check if the player is in the results
     if (player.getStatus() != PlayerStatus.IN_RESULTS) {

@@ -6,42 +6,46 @@
 package com.devathon.preguntonic.services;
 
 import com.devathon.preguntonic.dto.BasicPlayer;
-import com.devathon.preguntonic.dto.RoomPlayerInitInfo;
-import com.devathon.preguntonic.dto.RoomPlayerInitResponse;
+import com.devathon.preguntonic.dto.RoomConfiguration;
+import com.devathon.preguntonic.model.Game;
+import com.devathon.preguntonic.model.Player;
+import com.devathon.preguntonic.model.PlayerStatus;
 import com.devathon.preguntonic.model.Room;
+import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DummyRoomService implements RoomService {
 
   private static final Random random = new Random();
+  private static final String ROOM_NOT_FOUND_MSG = "Room not found";
   private final List<Room> rooms;
-  private final Map<String, List<String>> roomUsers;
 
   public DummyRoomService() {
     this.rooms = new ArrayList<>();
-    this.roomUsers = new HashMap<>();
   }
 
   @Override
-  public RoomPlayerInitResponse createRoom(final RoomPlayerInitInfo roomPlayerInitInfo) {
-    String roomCode = "R0Om" + random.nextInt(1000);
-    Room room =
+  public Room createRoom(final RoomConfiguration roomConfiguration) {
+    var roomCode = "R0Om" + random.nextInt(1000);
+    var room =
         Room.builder()
             .code(roomCode)
-            .maxPlayers(roomPlayerInitInfo.maxPlayers())
-            .numQuestions(roomPlayerInitInfo.numberOfQuestions())
+            .maxPlayers(roomConfiguration.maxPlayers())
+            .numQuestions(roomConfiguration.numberOfQuestions())
             .createdAt(LocalDateTime.now())
+            .players(new HashMap<>())
             .build();
     rooms.add(room);
-    return RoomPlayerInitResponse.builder().roomCode(roomCode).playerId(rooms.size()).build();
+    return room;
   }
 
   @Override
@@ -55,25 +59,110 @@ public class DummyRoomService implements RoomService {
   }
 
   @Override
-  public int joinRoom(final String roomCode, final String username) {
-    roomUsers.computeIfAbsent(roomCode, k -> new ArrayList<>()).add(username);
-    return roomUsers.get(roomCode).size();
-  }
+  public BasicPlayer joinRoom(final String roomCode, final BasicPlayer playerInfo) {
+    UUID playerId = Optional.ofNullable(playerInfo.id()).orElse(UUID.randomUUID());
 
-  @Override
-  public Optional<BasicPlayer> getPlayer(final String roomCode, final int playerId) {
-    if (roomUsers.containsKey(roomCode) && roomUsers.get(roomCode).size() >= playerId) {
-      return Optional.of(
-          BasicPlayer.builder()
-              .name(roomUsers.get(roomCode).get(playerId - 1))
-              .id(playerId)
-              .build());
+    var newPlayer =
+        Player.builder()
+            .id(playerId)
+            .name(playerInfo.name())
+            .avatar(playerInfo.avatar())
+            .status(PlayerStatus.IN_LOBBY_UNREADY)
+            .build();
+    if (Objects.isNull(playerInfo.id())) {
+      rooms.stream()
+          .filter(r -> r.getCode().equals(roomCode))
+          .findFirst()
+          .ifPresent(r -> r.addPlayer(newPlayer));
     }
-    return Optional.empty();
+    return BasicPlayer.builder()
+        .id(newPlayer.getId())
+        .avatar(newPlayer.getAvatar())
+        .name(newPlayer.getName())
+        .build();
   }
 
   @Override
-  public void resetGame(String roomCode) {
+  public BasicPlayer changePlayerReadyStatus(
+      final String roomCode, final UUID playerId, final PlayerStatus ready)
+      throws InvalidParameterException {
+    Optional<Player> playerO = findPlayerInRoom(roomCode, playerId);
+
+    if (playerO.isEmpty()) {
+      throw new InvalidParameterException("Player not found");
+    }
+
+    var player = playerO.get();
+    player.setStatus(ready);
+    return BasicPlayer.builder()
+        .id(player.getId())
+        .avatar(player.getAvatar())
+        .name(player.getName())
+        .build();
+  }
+
+  @Override
+  public Optional<Game> getGame(final String roomCode) {
+    Room room =
+        rooms.stream()
+            .filter(r -> r.getCode().equals(roomCode))
+            .findFirst()
+            .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG));
+
+    return Optional.ofNullable(room.getGame());
+  }
+
+  @Override
+  public Game createGame(final String roomCode) throws InvalidParameterException {
+    Room room =
+        rooms.stream()
+            .filter(r -> r.getCode().equals(roomCode))
+            .findFirst()
+            .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG));
+
+    Game game = Game.builder().build();
+    room.setGame(game);
+    return game;
+  }
+
+  @Override
+  public Optional<Player> getPlayer(final String roomCode, final UUID playerId) {
+    return findPlayerInRoom(roomCode, playerId);
+  }
+
+  @Override
+  public Optional<BasicPlayer> getBasicPlayer(final String roomCode, final UUID playerId) {
+    return findPlayerInRoom(roomCode, playerId)
+        .map(
+            p ->
+                BasicPlayer.builder()
+                    .id(p.getId())
+                    .avatar(p.getAvatar())
+                    .name(p.getName())
+                    .build());
+  }
+
+  private Optional<Player> findPlayerInRoom(final String roomCode, final UUID playerId) {
+    return rooms.stream()
+        .filter(r -> r.getCode().equals(roomCode))
+        .findFirst()
+        .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG))
+        .getPlayer(playerId);
+  }
+
+  @Override
+  public void resetGame(final String roomCode) {
     throw new UnsupportedOperationException("Not implemented yet");
+  }
+
+  @Override
+  public boolean roomContainsPlayer(final String roomCode, final UUID playerId) {
+    return rooms.stream()
+        .filter(r -> r.getCode().equals(roomCode))
+        .findFirst()
+        .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG))
+        .getPlayers()
+        .stream()
+        .anyMatch(p -> p.getId().equals(playerId));
   }
 }

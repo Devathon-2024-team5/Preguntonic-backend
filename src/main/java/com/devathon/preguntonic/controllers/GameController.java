@@ -33,8 +33,8 @@ public interface GameController {
    * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/join")
-  @SendTo("/preguntonic/rooms/{code}/game")
-  public GameStatusDto joinGame(
+  @SendTo("/app/rooms/{code}/game")
+  GameStatusDto joinGame(
       @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 
   /**
@@ -44,8 +44,8 @@ public interface GameController {
    * @return QuestionResultDto if all players answered, null otherwise
    */
   @MessageMapping("/players/{playerId}/response")
-  @SendTo("/preguntonic/rooms/{code}/game")
-  public QuestionResultDto answerQuestion(
+  @SendTo("/app/rooms/{code}/game")
+  QuestionResultDto answerQuestion(
       @DestinationVariable("code") String code,
       @DestinationVariable("playerId") UUID playerId,
       @Payload PlayerQuestionResponseDto response);
@@ -54,32 +54,33 @@ public interface GameController {
    * Handle when a player is ready to start the game
    *
    * @param code Code of the room
-   * @param playerId Id of the player
+   * @param playerId id of the player
    * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/next")
-  @SendTo("/preguntonic/rooms/{code}/game")
-  public GameStatusDto nextQuestion(
-      @DestinationVariable String code, @DestinationVariable UUID playerId);
+  @SendTo("/app/rooms/{code}/game")
+  GameStatusDto nextQuestion(
+      @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 
   /**
    * Players send when they leave the game
    *
    * @param code Code of the room
-   * @param playerId Id of the player
-   * @return
+   * @param playerId id of the player
+   * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/exit")
-  public GameStatusDto exitGame(
-      @DestinationVariable String code, @DestinationVariable UUID playerId);
+  GameStatusDto exitGame(
+      @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 
   /**
    * Players send when they are ready to re-start the game
    *
    * @param code Code of the room
-   * @param playerId Id of the player
+   * @param playerId id of the player
    * @return
    */
   @MessageMapping("/players/{playerId}/replay")
-  public String replayGame(@DestinationVariable String code, @DestinationVariable UUID playerId);
+  String replayGame(
+      @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 }

@@ -7,6 +7,7 @@ package com.devathon.preguntonic.model;
 
 public enum RoomStatus {
   WAITING,
+  READY,
   IN_GAME,
   FINISHED;
 }

@@ -18,7 +18,7 @@ class RoomPlayerInitInfoTest {
   void serialize() throws JsonProcessingException {
     var roomPlayerInitInfo = new RoomPlayerInitInfo(4, 10, "playerName", "1");
     var expected =
-        "{\"max_players\":4,\"num_of_question\":10,\"player_name\":\"playerName\",\"avatar_id\":\"1\"}";
+        "{\"playerName\":\"playerName\",\"avatar\":\"1\",\"maxPlayers\":4,\"numberOfQuestions\":10}";
 
     var serialized = objectMapper.writeValueAsString(roomPlayerInitInfo);
     assertEquals(expected, serialized);
@@ -27,7 +27,7 @@ class RoomPlayerInitInfoTest {
   @Test
   void deserialize() throws JsonProcessingException {
     var json =
-        "{\"max_players\":4,\"num_of_question\":10,\"player_name\":\"playerName\",\"avatar_id\":\"1\"}";
+        "{\"playerName\":\"playerName\",\"avatar\":\"1\",\"maxPlayers\":4,\"numberOfQuestions\":10}";
     var expected = new RoomPlayerInitInfo(4, 10, "playerName", "1");
 
     var deserialized = objectMapper.readValue(json, RoomPlayerInitInfo.class);

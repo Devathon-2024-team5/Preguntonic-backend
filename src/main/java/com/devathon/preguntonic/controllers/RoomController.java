@@ -6,11 +6,12 @@
 package com.devathon.preguntonic.controllers;
 
 import com.devathon.preguntonic.dto.BasicPlayer;
-import com.devathon.preguntonic.dto.PlayerEvent;
-import com.devathon.preguntonic.dto.RoomPlayerInitInfo;
-import com.devathon.preguntonic.dto.RoomPlayerInitResponse;
+import com.devathon.preguntonic.dto.LobbyEvent;
+import com.devathon.preguntonic.dto.RoomCodeResponse;
+import com.devathon.preguntonic.dto.RoomConfiguration;
 import com.devathon.preguntonic.model.Room;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -24,28 +25,34 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @RequestMapping("/v1/rooms")
+@MessageMapping("/rooms/{roomId}/lobby")
 public interface RoomController {
 
   @PostMapping
-  ResponseEntity<RoomPlayerInitResponse> createRoom(
-      @RequestBody RoomPlayerInitInfo roomPlayerInitInfo);
+  ResponseEntity<RoomCodeResponse> createRoom(@RequestBody RoomConfiguration roomConfiguration);
 
   @GetMapping
   ResponseEntity<List<String>> getRooms();
 
   @GetMapping("/{roomId}")
-  ResponseEntity<Room> getRoom(@PathVariable String roomId);
+  ResponseEntity<Room> getRoom(@PathVariable("roomId") String roomId);
 
-  @MessageMapping("/rooms.join/{roomId}")
-  ResponseEntity<PlayerEvent> joinRoom(@DestinationVariable String roomId, BasicPlayer player);
+  @PostMapping("/{roomId}/players")
+  ResponseEntity<BasicPlayer> addPlayerRoom(
+      @PathVariable("roomId") String roomId, @RequestBody BasicPlayer player);
 
-  @MessageMapping("/rooms.ready/{roomId}/{playerId}")
-  ResponseEntity<PlayerEvent> playerReadyInRoom(
-      @DestinationVariable String roomId, @DestinationVariable int playerId);
+  // Websocket endpoints
+  @MessageMapping("/join")
+  ResponseEntity<LobbyEvent> joinRoom(
+      @DestinationVariable("roomId") String roomId, BasicPlayer player);
 
-  @MessageMapping("/rooms.unready/{roomId}/{playerId}")
-  ResponseEntity<PlayerEvent> playerUnReadyInRoom(
-      @DestinationVariable String roomId, @DestinationVariable int playerId);
+  @MessageMapping("/players/{playerId}/ready")
+  ResponseEntity<LobbyEvent> playerReadyInRoom(
+      @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
+
+  @MessageMapping("/players/{playerId}/unready")
+  ResponseEntity<LobbyEvent> playerUnReadyInRoom(
+      @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 
   @EventListener
   void handleWebSocketConnectListener(SessionConnectEvent event);

@@ -53,11 +53,14 @@ public class Room {
 
   public Player addPlayer(final Player player) {
     players.put(player.getId(), player);
+    currentPlayers = players.size();
     return player;
   }
 
   public Player removePlayer(final UUID playerId) {
-    return players.remove(playerId);
+    final var removed = players.remove(playerId);
+    currentPlayers = players.size();
+    return removed;
   }
 
   /**
@@ -71,5 +74,9 @@ public class Room {
 
   public void cleanUp() {
     players.clear();
+  }
+
+  public boolean isFull() {
+    return players.size() >= maxPlayers;
   }
 }

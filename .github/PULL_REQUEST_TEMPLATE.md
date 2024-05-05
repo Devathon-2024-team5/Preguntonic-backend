@@ -1,6 +1,6 @@
 ## Description
 
-[//]: # (Please inlcude a summary of the change and which issues is fixed. Please also include relavant motivation and context. List any dependencies that are required fo change.)
+[//]: # (Please include a summary of the change and which issues is fixed. Please also include relevant motivation and context. List any dependencies that are required for change.)
 
 EDIT_THIS
 

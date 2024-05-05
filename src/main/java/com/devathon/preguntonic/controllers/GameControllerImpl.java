@@ -36,9 +36,9 @@ public class GameControllerImpl implements GameController {
   private static final long MAX_MILLISECONDS_TO_ANSWER = 30000;
   private static final int QUESTION_SCORE = 100;
 
-  private RoomService roomService;
+  private final RoomService roomService;
 
-  private QuestionService questionService;
+  private final QuestionService questionService;
 
   @Override
   public void gameSubscription(final String code) {

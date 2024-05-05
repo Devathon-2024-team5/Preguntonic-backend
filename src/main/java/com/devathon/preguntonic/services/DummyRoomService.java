@@ -59,7 +59,13 @@ public class DummyRoomService implements RoomService {
   }
 
   @Override
-  public BasicPlayer joinRoom(final String roomCode, final BasicPlayer playerInfo) {
+  public BasicPlayer joinRoom(String roomCode, BasicPlayer playerInfo)
+      throws InvalidParameterException {
+    return null;
+  }
+
+  @Override
+  public BasicPlayer addRoom(final String roomCode, final BasicPlayer playerInfo) {
     UUID playerId = Optional.ofNullable(playerInfo.id()).orElse(UUID.randomUUID());
 
     var newPlayer =

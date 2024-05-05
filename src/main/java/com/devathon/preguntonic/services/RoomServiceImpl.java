@@ -60,6 +60,27 @@ public class RoomServiceImpl implements RoomService {
   @Override
   public BasicPlayer joinRoom(final String roomCode, final BasicPlayer playerInfo)
       throws InvalidParameterException {
+    if (Objects.isNull(playerInfo) || Objects.isNull(playerInfo.id())) {
+      throw new InvalidParameterException("Player info is required");
+    }
+    if (!roomContainsPlayer(roomCode, playerInfo.id())) {
+      throw new InvalidParameterException("Room or player does not exist");
+    }
+
+    Optional<Player> playerO = roomStorage.getPlayerFromRoom(roomCode, playerInfo.id());
+
+    playerO.ifPresent(
+        player -> {
+          player.setStatus(PlayerStatus.IN_LOBBY_UNREADY);
+          roomStorage.updatePlayerInRoom(roomCode, player);
+        });
+
+    return playerO.map(BasicPlayer::from).orElse(null);
+  }
+
+  @Override
+  public BasicPlayer addRoom(final String roomCode, final BasicPlayer playerInfo)
+      throws InvalidParameterException {
 
     if (roomContainsPlayer(roomCode, playerInfo.id())) {
       log.info("Player {} already in room {}", playerInfo.name(), roomCode);
@@ -70,7 +91,7 @@ public class RoomServiceImpl implements RoomService {
         roomStorage
             .addPlayerToRoom(roomCode, buildNewPlayer(playerInfo))
             .orElseThrow(() -> new InvalidParameterException("Player could not be added to room"));
-    return buildBasicPlayer(addedPlayer);
+    return BasicPlayer.from(addedPlayer);
   }
 
   @Override
@@ -85,15 +106,7 @@ public class RoomServiceImpl implements RoomService {
         .id(playerId)
         .name(playerInfo.name())
         .avatar(playerInfo.avatar())
-        .status(PlayerStatus.IN_LOBBY_UNREADY)
-        .build();
-  }
-
-  private static BasicPlayer buildBasicPlayer(final Player player) {
-    return BasicPlayer.builder()
-        .id(player.getId())
-        .name(player.getName())
-        .avatar(player.getAvatar())
+        .status(PlayerStatus.CONNECTING)
         .build();
   }
 
@@ -112,7 +125,7 @@ public class RoomServiceImpl implements RoomService {
           throw new InvalidParameterException("Player not found in room");
         });
 
-    return playerFromRoom.map(RoomServiceImpl::buildBasicPlayer).orElse(null);
+    return playerFromRoom.map(BasicPlayer::from).orElse(null);
   }
 
   @Override
@@ -127,7 +140,7 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public Optional<BasicPlayer> getBasicPlayer(final String roomCode, final UUID playerId) {
-    return this.getPlayer(roomCode, playerId).map(RoomServiceImpl::buildBasicPlayer);
+    return this.getPlayer(roomCode, playerId).map(BasicPlayer::from);
   }
 
   @Override

@@ -52,9 +52,17 @@ public interface RoomService {
    *
    * @param roomCode the room code
    * @param playerId the player id
-   * @return the player
+   * @return the player in the room or Optional.Empty
    */
   Optional<Player> getPlayer(String roomCode, UUID playerId);
+
+  /**
+   * Get the players in a room, if the room does not exist, it will return an empty list
+   *
+   * @param roomCode
+   * @return the players in the room or an empty list
+   */
+  List<Player> getPlayersInRoom(String roomCode);
 
   /**
    * Get the basic player for a room, if the room or player does not exist, it will return

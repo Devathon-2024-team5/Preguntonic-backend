@@ -10,4 +10,4 @@ import lombok.Builder;
 
 @Builder
 public record RoomConfiguration(
-    @JsonProperty int maxPlayers, @JsonProperty int numberOfQuestions) {}
+    @JsonProperty int maxPlayers, @JsonProperty("numOfQuestions") int numberOfQuestions) {}

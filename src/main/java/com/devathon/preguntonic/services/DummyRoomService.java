@@ -131,6 +131,15 @@ public class DummyRoomService implements RoomService {
   }
 
   @Override
+  public List<Player> getPlayersInRoom(String roomCode) {
+    return rooms.stream()
+        .filter(r -> r.getCode().equals(roomCode))
+        .findFirst()
+        .orElseThrow(() -> new InvalidParameterException(ROOM_NOT_FOUND_MSG))
+        .getPlayers();
+  }
+
+  @Override
   public Optional<BasicPlayer> getBasicPlayer(final String roomCode, final UUID playerId) {
     return findPlayerInRoom(roomCode, playerId)
         .map(

@@ -121,6 +121,11 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
+  public List<Player> getPlayersInRoom(final String roomCode) {
+    return roomStorage.getPlayersFromRoom(roomCode);
+  }
+
+  @Override
   public Optional<BasicPlayer> getBasicPlayer(final String roomCode, final UUID playerId) {
     return this.getPlayer(roomCode, playerId).map(RoomServiceImpl::buildBasicPlayer);
   }

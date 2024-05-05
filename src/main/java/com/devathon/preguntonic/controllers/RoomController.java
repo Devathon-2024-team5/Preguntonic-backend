@@ -9,6 +9,7 @@ import com.devathon.preguntonic.dto.BasicPlayer;
 import com.devathon.preguntonic.dto.LobbyEvent;
 import com.devathon.preguntonic.dto.RoomCodeResponse;
 import com.devathon.preguntonic.dto.RoomConfiguration;
+import com.devathon.preguntonic.model.Player;
 import com.devathon.preguntonic.model.Room;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public interface RoomController {
   ResponseEntity<RoomCodeResponse> createRoom(@RequestBody RoomConfiguration roomConfiguration);
 
   @GetMapping
-  ResponseEntity<List<String>> getRooms();
+  ResponseEntity<List<Room>> getRooms();
 
   @GetMapping("/{roomId}")
   ResponseEntity<Room> getRoom(@PathVariable("roomId") String roomId);
@@ -40,6 +41,9 @@ public interface RoomController {
   @PostMapping("/{roomId}/players")
   ResponseEntity<BasicPlayer> addPlayerRoom(
       @PathVariable("roomId") String roomId, @RequestBody BasicPlayer player);
+
+  @GetMapping("/{roomId}/players")
+  ResponseEntity<List<Player>> getPlayersInRoom(@PathVariable("roomId") String roomId);
 
   // Websocket endpoints
   @MessageMapping("/join")

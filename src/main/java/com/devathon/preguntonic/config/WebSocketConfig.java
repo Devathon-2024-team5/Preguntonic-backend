@@ -32,20 +32,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   /**
    * This method configures the message broker.
    *
+   * <p>[1] The prefix for the application destination is used to filter the messages that are sent
+   * from the client to the server. [2] Enable a simple broker in memory to send messages from the
+   * server to the client. The destinations are used to filter the messages. Any message that
+   * doesn't match with any of the destinations will be ignored.
+   *
    * @param registry the registry of the message broker.
    */
   @Override
   public void configureMessageBroker(MessageBrokerRegistry registry) {
     registry
-        .setApplicationDestinationPrefixes("/app") // [1]The prefix for the application destination.
-        .enableSimpleBroker(
-            "/room"); // [2]Enable the simple broker (some examples of destinations).
-
-    // Help:
-    // [1] The prefix for the application destination is used to filter the messages
-    // that are sent from the client to the server.
-    // [2] Enable a simple broker in memory to send messages from the server to the
-    // client. The destinations are used to filter the messages.
-    // Any message that doesn't match with any of the destinations will be ignored.
+        // [1] The prefix for the application destination.
+        .setApplicationDestinationPrefixes("/app")
+        // [2] Enable the simple broker (some examples of destinations).
+        .enableSimpleBroker("/room");
   }
 }

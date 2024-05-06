@@ -58,7 +58,7 @@ public interface GameController {
    * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/next")
-  @SendTo("/room/{code}/game")
+  @SendTo("/room/{code}/game/questions")
   GameStatusDto nextQuestion(
       @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 

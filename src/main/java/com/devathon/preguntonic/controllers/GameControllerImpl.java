@@ -129,7 +129,7 @@ public class GameControllerImpl implements GameController {
     // Check if DTO is valid
     if (response == null
         || response.questionId() == null
-        || response.responseId() == null
+        || (response.responseId() == null && !response.timeout())
         || response.milliseconds() == 0) {
       log.error("Response is not valid");
       return null;
@@ -154,14 +154,15 @@ public class GameControllerImpl implements GameController {
 
     Question question = optQuestion.get();
 
-    if (question.getAnswers().stream().noneMatch(a -> a.getId().equals(response.responseId()))) {
+    if (!response.timeout()
+        && question.getAnswers().stream().noneMatch(a -> a.getId().equals(response.responseId()))) {
       log.error("Response {} not found in question {}", response.responseId(), question.getId());
       return null;
     }
 
     // Response
     Player player = roomService.getPlayer(code, playerId).get();
-    player.response(response.responseId(), response.milliseconds());
+    player.response(response.responseId(), response.milliseconds(), response.timeout());
 
     boolean allPlayersAnswered = room.getPlayers().stream().allMatch(p -> p.isResponded());
 
@@ -182,7 +183,8 @@ public class GameControllerImpl implements GameController {
 
       Player currentPlayer = orderedPlayers.get(i);
       int newScore = 0;
-      if (currentPlayer.getResponseId().equals(question.getCorrectAnswer().getId())) {
+      if (!currentPlayer.isTimeout()
+          && currentPlayer.getResponseId().equals(question.getCorrectAnswer().getId())) {
         // int score = QUESTION_SCORE * ((numPlayers - i) / numPlayers) + (int)
         // (MAX_MILLISECONDS_TO_ANSWER - currentPlayer.getResponseTime());
         newScore = (int) (QUESTION_SCORE * (((float) numPlayers - i) / (float) numPlayers));

@@ -35,11 +35,13 @@ public class Player {
   private boolean responded;
   private long responseTime;
   private UUID responseId;
+  private boolean timeout;
   private boolean readyForNextQuestion;
 
-  public void response(UUID responseId, long responseTime) {
+  public void response(UUID responseId, long responseTime, boolean timeout) {
     this.responseId = responseId;
     this.responseTime = responseTime;
+    this.timeout = timeout;
     this.responded = true;
   }
 
@@ -47,5 +49,6 @@ public class Player {
     this.responseId = null;
     this.responseTime = -1;
     this.responded = false;
+    this.timeout = false;
   }
 }

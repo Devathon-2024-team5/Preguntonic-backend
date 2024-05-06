@@ -5,6 +5,7 @@
  */
 package com.devathon.preguntonic.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -35,6 +36,7 @@ public class Answer {
   private boolean isCorrect;
 
   @ManyToOne
+  @JsonIgnore
   @JoinColumn(name = "question_id", nullable = false)
   private Question question;
 }

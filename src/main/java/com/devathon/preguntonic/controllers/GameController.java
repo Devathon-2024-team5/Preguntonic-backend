@@ -44,7 +44,7 @@ public interface GameController {
    * @return QuestionResultDto if all players answered, null otherwise
    */
   @MessageMapping("/players/{playerId}/response")
-  @SendTo("/room/{code}/game")
+  @SendTo("/room/{code}/questions")
   QuestionResultDto answerQuestion(
       @DestinationVariable("code") String code,
       @DestinationVariable("playerId") UUID playerId,
@@ -58,7 +58,7 @@ public interface GameController {
    * @return GameStatusDto with the updated players
    */
   @MessageMapping("/players/{playerId}/next")
-  @SendTo("/room/{code}/game/questions")
+  @SendTo("/room/{code}/game")
   GameStatusDto nextQuestion(
       @DestinationVariable("code") String code, @DestinationVariable("playerId") UUID playerId);
 

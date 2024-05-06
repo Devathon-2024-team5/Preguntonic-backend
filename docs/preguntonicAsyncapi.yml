@@ -3,7 +3,7 @@ info:
   title: Preguntonic API
   version: 1.2.0
   description: |-
-    Preguntonic s una API en tiempo real diseñada para sesiones interactivas de preguntas y respuestas. Ofrece una plataforma dinámica donde puedes:
+    Preguntonic es una API en tiempo real diseñada para sesiones interactivas de preguntas y respuestas. Ofrece una plataforma dinámica donde puedes:
 
     - Hacer preguntas a una amplia audiencia.
     - Manejar respuestas inmediatas de los participantes.

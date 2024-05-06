@@ -1,20 +1,23 @@
 asyncapi: 3.0.0
 info:
   title: Preguntonic API
-  version: 1.0.0
+  version: 1.2.0
   description: |-
-    Preguntonic is a real-time API designed for interactive Q&A sessions. It offers a dynamic platform where you can:
+    Preguntonic s una API en tiempo real diseñada para sesiones interactivas de preguntas y respuestas. Ofrece una plataforma dinámica donde puedes:
 
-    - Pose questions to a wide audience.
-    - Handle immediate responses from participants.
-    - Engage in fun and informative games with your friends.
+    - Hacer preguntas a una amplia audiencia.
+    - Manejar respuestas inmediatas de los participantes.
+    - Participar en juegos divertidos e informativos con tus amigos.
+  license:
+    name: MIT License
+    url: 'https://opensource.org/license/MIT'
 
 servers:
-  main:
+  local:
     host: localhost:8080
     pathname: /preguntonic
     protocol: http
-    description: The main server that serves the API and the WebSockets.
+    description: El servidor local que sirve la API y los WebSockets.
 
 defaultContentType: 'application/json'
 
@@ -24,40 +27,40 @@ components:
 
     subscribePlayerRoom:
       summary: Respuesta para cuando un jugador se subscribe a una sala
-      payload: 
+      payload:
         $ref: '#/components/schemas/subscribePlayerRoom'
 
     playerJoinRoom:
       summary: Respuesta para cuando un jugador se une a una sala
-      payload: 
+      payload:
         $ref: '#/components/schemas/playerJoinRoom'
 
     playerReadyRequest:
       summary: Peticion para cuando un jugador esta listo
-      payload: 
+      payload:
         $ref: '#/components/schemas/playerReadyRequest'
 
     playerReadyResponse:
       summary: Respuesta para cuando un jugador esta listo
-      payload: 
+      payload:
         $ref: '#/components/schemas/playerReadyResponse'
 
     unansweredQuestion:
       summary: Pregunta sin responder
-      payload: 
+      payload:
         $ref: '#/components/schemas/question'
 
     playerQuestionResponse:
       summary: Respuesta de un jugador
-      payload: 
+      payload:
         $ref: '#/components/schemas/playerQuestionResponse'
 
     gameQuestionResult:
       summary: Resultado de una pregunta
-      payload: 
+      payload:
         $ref: '#/components/schemas/gameQuestionResult'
 
-    
+
 
   schemas:
     subscribePlayerRoom:
@@ -66,11 +69,11 @@ components:
       properties:
         playerId:
           type: string
-          description: ID del 
-          
+          description: ID del
+
     playerJoinRoom:
       type: object
-      description: Respuesta para cuando un jugador se une a una sala
+      description: Mensaje enviado al topico para cuando un jugador se une a una sala
       properties:
         playerId:
           type: string
@@ -165,52 +168,64 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/playerQuestionResponse'
-      
 
-channels: 
-
+channels:
+  # Room actions
   playerSubscribeRoomChannel:
     address: '/room/<roomId>'
     messages:
-      subscribePlayerRoom: 
+      subscribePlayerRoom:
         $ref: '#/components/messages/subscribePlayerRoom'
 
   playerJoinRoomChannel:
-    address: '/app/rooms.join/<roomId>/<playerId>'
+    address: '/app/rooms/<roomId>/lobby/join'
     messages:
-      playerJoinRoom: 
+      playerJoinRoom:
         $ref: '#/components/messages/playerJoinRoom'
 
   playerReadyChannel:
-    address: '/app/rooms.ready/<roomId>/<playerId>'
+    address: '/app/rooms/<roomId>/players/<playerId>/ready'
     messages:
-      playerReadyRequest: 
+      playerReadyRequest:
         $ref: '#/components/messages/playerReadyRequest'
-      playerReadyResponse: 
+      playerReadyResponse:
         $ref: '#/components/messages/playerReadyResponse'
 
-  playerSubscribeGameChannel:
-    address: '/app/rooms/<roomId>/game'
+  playerUnreadyChannel:
+    address: '/app/rooms/<roomId>/players/<playerId>/unready'
     messages:
-      unansweredQuestion: 
+      playerReadyRequest:
+        $ref: '#/components/messages/playerReadyRequest'
+      playerReadyResponse:
+        $ref: '#/components/messages/playerReadyResponse'
+
+  # Game actions
+  playerSubscribeGameChannel:
+    address: '/room/<roomId>/game'
+    messages:
+      unansweredQuestion:
         $ref: '#/components/messages/unansweredQuestion'
+
+  playerJoinGameChannel:
+    address: '/app/rooms/<roomId>/game/players/<playerId>/join'
+    messages:
+      playerJoinRoom:
+        $ref: '#/components/messages/playerJoinRoom'
 
   playerAnswerQuestionChannel:
     address: '/app/rooms/<roomId>/game/question/<questionId>'
     messages:
-      playerQuestionResponse: 
+      playerQuestionResponse:
         $ref: '#/components/messages/playerQuestionResponse'
 
   gameQuestionResultChannel:
     address: '/app/rooms/<roomId>/game/question/<questionId>/result'
     messages:
-      gameQuestionResult: 
+      gameQuestionResult:
         $ref: '#/components/messages/gameQuestionResult'
 
 
-      
-
-operations: 
+operations:
 
   onUserJoinRoom:
     title: User join room

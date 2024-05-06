@@ -1,0 +1,307 @@
+openapi: 3.0.3
+info:
+  title: Preguntonic API OpenAPI 3.0
+  description: |-
+    Preguntonic es una API en tiempo real diseñada para sesiones interactivas de preguntas y respuestas. Ofrece una plataforma dinámica donde puedes:
+
+      - Hacer preguntas a una amplia audiencia.
+      - Manejar respuestas inmediatas de los participantes.
+      - Participar en juegos divertidos e informativos con tus amigos.
+  version: 1.2.0
+  license:
+    name: MIT License
+    url: 'https://opensource.org/license/MIT'
+
+servers:
+  - url: 'http://localhost:8080/v1/'
+    description: El servidor local encargado de proporcionar la API y los WebSockets.
+
+externalDocs:
+    description: "Obtén más información acerca de Preguntonic."
+    url: "TODO"
+
+tags:
+  - name: room
+    description: Información sobre las salas de juego.
+  - name: player
+    description: Información sobre los jugadores.
+
+paths:
+  /rooms:
+    get:
+      summary: Obtiene la lista de salas de juego.
+      tags:
+        - room
+      responses:
+        '200':
+          description: Lista de salas de juego.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/room'
+
+    post:
+      summary: Crea una nueva sala de juego.
+      tags:
+        - room
+      requestBody:
+        description: Datos de la sala de juego.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/roomConfig'
+      responses:
+        '201':
+          description: Sala de juego creada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/roomCode'
+
+  /rooms/{roomId}:
+    get:
+      summary: Obtiene la información de una sala de juego.
+      tags:
+        - room
+      parameters:
+        - name: roomId
+          in: path
+          description: Identificador de la sala de juego.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Información de la sala de juego.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/room'
+        '404':
+          description: Sala de juego no encontrada.
+
+  /rooms/{roomId}/players:
+    get:
+      summary: Obtiene la lista de jugadores en una sala de juego.
+      tags:
+        - player
+      parameters:
+        - name: roomId
+          in: path
+          description: Identificador de la sala de juego.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de jugadores.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/player'
+
+    post:
+      summary: Añade un jugador a una sala de juego.
+      tags:
+        - player
+      parameters:
+        - name: roomId
+          in: path
+          description: Identificador de la sala de juego.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Datos del jugador.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasicPlayer'
+      responses:
+        '201':
+          description: Jugador añadido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicPlayer'
+        '404':
+          description: Sala de juego no encontrada.
+
+
+components:
+  schemas:
+    room:
+      type: object
+      properties:
+        id:
+          type: string
+          description: UUID identificador de la sala de juego.
+        code:
+          type: string
+          description: Codigo de la sala de juego.
+        status:
+          type: string
+          description: Estado de la sala de juego.
+          enum:
+            - WAITING
+            - READY
+            - IN_GAME
+            - FINISHED
+        game:
+          $ref: '#/components/schemas/game'
+        maxPlayers:
+          type: integer
+          description: Número máximo de jugadores en la sala.
+        currentPlayers:
+          type: integer
+          description: Número actual de jugadores en la sala.
+        numQuestions:
+          type: integer
+          description: Número de preguntas en el juego.
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/player'
+    roomConfig:
+      type: object
+      properties:
+        maxPlayers:
+          type: integer
+          description: Número máximo de jugadores en la sala.
+        numOfQuestions:
+          type: integer
+          description: Número de preguntas en el juego.
+
+    roomCode:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código de la sala de juego.
+
+    player:
+      type: object
+      properties:
+        playerId:
+          type: string
+          description: Identificador del jugador.
+        admin:
+          type: boolean
+          description: Indica si el jugador es el administrador de la sala.
+        avatar:
+          type: string
+          description: URL de la imagen del avatar del jugador.
+        playerName:
+          type: string
+          description: Nombre del jugador.
+        playerStatus:
+            type: string
+            description: Estado del jugador.
+            enum:
+                - CONNECTING
+                - IN_LOBBY_UNREADY
+                - IN_LOBBY_READY
+                - IN_GAME
+                - IN_RESULTS
+                - DISCONNECTED
+        score:
+          type: integer
+          description: Puntuación del jugador.
+
+        responded:
+          type: boolean
+          description: Indica si el jugador ha respondido a la pregunta.
+        responseTime:
+          type: integer
+          description: Tiempo en responder la pregunta (en milisegundos).
+        responseId:
+          type: string
+          description: Identificador de la respuesta.
+        readyForNextQuestion:
+          type: boolean
+          description: Indica si el jugador esta listo para la siguiente pregunta.
+
+    BasicPlayer:
+      type: object
+      properties:
+        playerId:
+          type: string
+          description: Identificador del jugador.
+        playerName:
+          type: string
+          description: Nombre del jugador.
+        avatar:
+          type: string
+          description: URL de la imagen del avatar del jugador.
+
+    question:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificador de la pregunta.
+        question:
+          type: string
+          description: Descripción de la pregunta.
+        topic:
+          type: string
+          description: Tema de la pregunta.
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/answer'
+
+    answer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificador de la respuesta.
+        answer:
+          type: string
+          description: Descripción de la respuesta.
+        isCorrect:
+          type: boolean
+          description: Indica si la respuesta es correcta.
+
+    playerQuestionResponse:
+      type: object
+      properties:
+        playerId:
+          type: string
+          description: Identificador del jugador.
+        questionId:
+          type: string
+          description: Identificador de la pregunta.
+        answerId:
+          type: string
+          description: Identificador de la respuesta.
+        time:
+          type: integer
+          description: Tiempo en responder la pregunta (en milisegundos).
+
+    game:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificador del juego.
+        currentQuestion:
+          $ref: '#/components/schemas/question'
+        currentQuestionOrdinal:
+          type: integer
+          description: Número de la pregunta actual.
+        gameStatus:
+          type: string
+          description: Estado del juego.
+          enum:
+            - WAITING
+            - READY
+            - IN_GAME
+            - FINISHED

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -44,14 +45,15 @@ public class RoomControllerImpl implements RoomController {
   public ResponseEntity<RoomCodeResponse> createRoom(final RoomConfiguration roomConfiguration) {
     final Room room = roomService.createRoom(roomConfiguration);
     log.info("Room created: {}", room);
-    return ResponseEntity.ok(RoomCodeResponse.builder().roomCode(room.getCode()).build());
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(RoomCodeResponse.builder().roomCode(room.getCode()).build());
   }
 
   @Override
   public ResponseEntity<BasicPlayer> addPlayerRoom(final String roomId, final BasicPlayer player) {
     log.info("Adding player {} to room {}", player.name(), roomId);
     try {
-      return ResponseEntity.ok(roomService.addRoom(roomId, player));
+      return ResponseEntity.status(HttpStatus.CREATED).body(roomService.addRoom(roomId, player));
     } catch (final Exception e) {
       log.warn(ERROR_JOINING_ROOM_MSG, e);
       return ResponseEntity.badRequest().build();

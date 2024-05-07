@@ -4,7 +4,7 @@ WORKDIR /workdir
 
 COPY . .
 
-RUN mvn install -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM amazoncorretto:17-alpine3.19-jdk
 

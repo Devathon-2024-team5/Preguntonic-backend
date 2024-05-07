@@ -213,7 +213,7 @@ channels:
         $ref: '#/components/messages/playerJoinRoom'
 
   playerAnswerQuestionChannel:
-    address: '/app/rooms/<roomId>/game/question/<questionId>'
+    address: '/app/rooms/<roomId>/question/<questionId>'
     messages:
       playerQuestionResponse:
         $ref: '#/components/messages/playerQuestionResponse'

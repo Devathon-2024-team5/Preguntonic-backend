@@ -201,6 +201,7 @@ public class GameControllerImpl implements GameController {
         .question(QuestionDto.from(question, room.getGame().getCurrentQuestionOrdinal()))
         .players(PlayerStatusDto.from(room.getPlayers().stream().toList()))
         .correctAnswerId(question.getCorrectAnswer().getId())
+        .correctAnswer(question.getCorrectAnswer().getAnswer())
         .build();
   }
 

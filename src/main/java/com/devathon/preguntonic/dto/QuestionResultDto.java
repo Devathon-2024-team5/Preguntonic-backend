@@ -14,4 +14,5 @@ import lombok.Builder;
 public record QuestionResultDto(
     @JsonProperty("players") List<PlayerStatusDto> players,
     @JsonProperty("question") QuestionDto question,
-    @JsonProperty("correct_answer_id") UUID correctAnswerId) {}
+    @JsonProperty("correct_answer_id") UUID correctAnswerId,
+    @JsonProperty("correct_answer") String correctAnswer) {}

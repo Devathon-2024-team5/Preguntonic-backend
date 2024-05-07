@@ -36,6 +36,7 @@ public class Answer {
   private boolean isCorrect;
 
   @ManyToOne
+  @JsonIgnore
   @JoinColumn(name = "question_id", nullable = false)
   @JsonIgnore
   private Question question;

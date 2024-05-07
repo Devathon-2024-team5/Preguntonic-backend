@@ -44,7 +44,7 @@ public interface GameController {
    * @return QuestionResultDto if all players answered, null otherwise
    */
   @MessageMapping("/players/{playerId}/response")
-  @SendTo("/room/{code}/game")
+  @SendTo("/room/{code}/questions")
   QuestionResultDto answerQuestion(
       @DestinationVariable("code") String code,
       @DestinationVariable("playerId") UUID playerId,

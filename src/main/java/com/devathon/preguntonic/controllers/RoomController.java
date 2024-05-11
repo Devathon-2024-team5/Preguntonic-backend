@@ -17,6 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,14 +48,17 @@ public interface RoomController {
 
   // Websocket endpoints
   @MessageMapping("/join")
+  @SendTo("/room/{roomId}")
   ResponseEntity<LobbyEvent> joinRoom(
       @DestinationVariable("roomId") String roomId, BasicPlayer player);
 
   @MessageMapping("/players/{playerId}/ready")
+  @SendTo("/room/{roomId}")
   ResponseEntity<LobbyEvent> playerReadyInRoom(
       @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 
   @MessageMapping("/players/{playerId}/unready")
+  @SendTo("/room/{roomId}")
   ResponseEntity<LobbyEvent> playerUnReadyInRoom(
       @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 

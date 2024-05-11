@@ -96,8 +96,7 @@ public class RoomControllerImpl implements RoomController {
       return ResponseEntity.internalServerError().build();
     }
 
-    var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.JOIN);
-    return ResponseEntity.ok(lobbyEvent);
+    return ResponseEntity.ok(buildLobbyEvent(roomId, RoomEvent.JOIN));
   }
 
   @Override
@@ -113,10 +112,12 @@ public class RoomControllerImpl implements RoomController {
       return ResponseEntity.internalServerError().build();
     }
 
-    var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.READY);
+    var lobbyEvent = buildLobbyEvent(roomId, RoomEvent.READY);
 
     if (isGameReadyToStart(roomId)) {
-      sentLobbyEventToRoomTopic(roomId, RoomEvent.START_GAME);
+      LobbyEvent startGameEvent = buildLobbyEvent(roomId, RoomEvent.START_GAME);
+      messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, lobbyEvent);
+      return ResponseEntity.ok(startGameEvent);
     }
 
     return ResponseEntity.ok(lobbyEvent);
@@ -144,23 +145,15 @@ public class RoomControllerImpl implements RoomController {
       return ResponseEntity.internalServerError().build();
     }
 
-    var lobbyEvent = sentLobbyEventToRoomTopic(roomId, RoomEvent.UNREADY);
-    return ResponseEntity.ok(lobbyEvent);
+    return ResponseEntity.ok(buildLobbyEvent(roomId, RoomEvent.UNREADY));
   }
 
-  private LobbyEvent sentLobbyEventToRoomTopic(final String roomId, final RoomEvent roomEvent) {
+  private LobbyEvent buildLobbyEvent(final String roomId, final RoomEvent roomEvent) {
     return roomService
         .getRoom(roomId)
         .map(
-            room -> {
-              var lobbyEvent =
-                  LobbyEvent.builder()
-                      .event(roomEvent)
-                      .roomStatus(LobbyStatusDto.from(room))
-                      .build();
-              messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, lobbyEvent);
-              return lobbyEvent;
-            })
+            room ->
+                LobbyEvent.builder().event(roomEvent).roomStatus(LobbyStatusDto.from(room)).build())
         .orElse(LobbyEvent.builder().build());
   }
 

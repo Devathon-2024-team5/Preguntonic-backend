@@ -49,17 +49,16 @@ public interface RoomController {
   // Websocket endpoints
   @MessageMapping("/join")
   @SendTo("/room/{roomId}")
-  ResponseEntity<LobbyEvent> joinRoom(
-      @DestinationVariable("roomId") String roomId, BasicPlayer player);
+  LobbyEvent joinRoom(@DestinationVariable("roomId") String roomId, BasicPlayer player);
 
   @MessageMapping("/players/{playerId}/ready")
   @SendTo("/room/{roomId}")
-  ResponseEntity<LobbyEvent> playerReadyInRoom(
+  LobbyEvent playerReadyInRoom(
       @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 
   @MessageMapping("/players/{playerId}/unready")
   @SendTo("/room/{roomId}")
-  ResponseEntity<LobbyEvent> playerUnReadyInRoom(
+  LobbyEvent playerUnReadyInRoom(
       @DestinationVariable("roomId") String roomId, @DestinationVariable("playerId") UUID playerId);
 
   @EventListener

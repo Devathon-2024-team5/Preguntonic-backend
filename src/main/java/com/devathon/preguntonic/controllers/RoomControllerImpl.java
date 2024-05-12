@@ -83,44 +83,36 @@ public class RoomControllerImpl implements RoomController {
   }
 
   @Override
-  public ResponseEntity<LobbyEvent> joinRoom(final String roomId, final BasicPlayer player) {
+  public LobbyEvent joinRoom(final String roomId, final BasicPlayer player) {
     log.info("Joining room {} with user {}", roomId, player.name());
     try {
       BasicPlayer playerResponse = roomService.joinRoom(roomId, player);
       log.info("Player {} joined room {}", playerResponse.id(), roomId);
-    } catch (final InvalidParameterException e) {
-      log.warn(ERROR_JOINING_ROOM_MSG, e);
-      return ResponseEntity.badRequest().build();
     } catch (final Exception e) {
       log.warn(ERROR_JOINING_ROOM_MSG, e);
-      return ResponseEntity.internalServerError().build();
     }
 
-    return ResponseEntity.ok(buildLobbyEvent(roomId, RoomEvent.JOIN));
+    return buildLobbyEvent(roomId, RoomEvent.JOIN);
   }
 
   @Override
-  public ResponseEntity<LobbyEvent> playerReadyInRoom(final String roomId, final UUID playerId) {
+  public LobbyEvent playerReadyInRoom(final String roomId, final UUID playerId) {
     log.info("Player {} is ready in room {}", playerId, roomId);
     try {
       roomService.changePlayerReadyStatus(roomId, playerId, PlayerStatus.IN_LOBBY_READY);
-    } catch (final InvalidParameterException e) {
-      log.warn(PLAYER_READY_ERROR_MSG, e);
-      return ResponseEntity.badRequest().build();
     } catch (final Exception e) {
       log.warn(PLAYER_READY_ERROR_MSG, e);
-      return ResponseEntity.internalServerError().build();
     }
 
-    var lobbyEvent = buildLobbyEvent(roomId, RoomEvent.READY);
+    final var lobbyEvent = buildLobbyEvent(roomId, RoomEvent.READY);
 
     if (isGameReadyToStart(roomId)) {
       LobbyEvent startGameEvent = buildLobbyEvent(roomId, RoomEvent.START_GAME);
       messagingTemplate.convertAndSend(ROOM_DESTINATION_BASE_PATH + roomId, lobbyEvent);
-      return ResponseEntity.ok(startGameEvent);
+      return startGameEvent;
     }
 
-    return ResponseEntity.ok(lobbyEvent);
+    return lobbyEvent;
   }
 
   private boolean isGameReadyToStart(final String roomId) {
@@ -132,20 +124,16 @@ public class RoomControllerImpl implements RoomController {
   }
 
   @Override
-  public ResponseEntity<LobbyEvent> playerUnReadyInRoom(final String roomId, final UUID playerId) {
+  public LobbyEvent playerUnReadyInRoom(final String roomId, final UUID playerId) {
     log.info("Player {} is unready in room {}", playerId, roomId);
 
     try {
       roomService.changePlayerReadyStatus(roomId, playerId, PlayerStatus.IN_LOBBY_UNREADY);
-    } catch (final InvalidParameterException e) {
-      log.warn(PLAYER_READY_ERROR_MSG, e);
-      return ResponseEntity.badRequest().build();
     } catch (final Exception e) {
       log.warn(PLAYER_READY_ERROR_MSG, e);
-      return ResponseEntity.internalServerError().build();
     }
 
-    return ResponseEntity.ok(buildLobbyEvent(roomId, RoomEvent.UNREADY));
+    return buildLobbyEvent(roomId, RoomEvent.UNREADY);
   }
 
   private LobbyEvent buildLobbyEvent(final String roomId, final RoomEvent roomEvent) {
